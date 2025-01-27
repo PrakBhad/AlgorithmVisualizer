@@ -17,17 +17,3 @@ def insertion_sort_desc(arr):
             arr[j+1] = arr[j]
             j-=1
         arr[j+1] = key
-
-if __name__ == "__main__":
-    arr = [64, 34, 25, 12, 22, 11, 90]
-
-    print("Sorted array in ascending:")
-    insertion_sort_asc(arr)
-    for i in range(len(arr)):
-        print("%d" % arr[i], end=" ")
-    print()        
-        
-    print("Sorted array in descending:")
-    insertion_sort_desc(arr)
-    for i in range(len(arr)):
-        print("%d" % arr[i], end=" ")

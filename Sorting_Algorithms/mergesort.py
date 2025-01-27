@@ -100,18 +100,3 @@ def merge_sort_desc(arr, left, right):
         merge_sort_desc(arr, left, mid)
         merge_sort_desc(arr, mid+1, right)
         merge_desc(arr, left, mid, right)
-
-
-if __name__ == "__main__":
-    arr = [64, 34, 25, 12, 22, 11, 90]
-
-    print("Sorted array in ascending:")
-    merge_sort_asc(arr, 0, (len(arr)-1))
-    for i in range(len(arr)):
-        print("%d" % arr[i], end=" ")
-    print()
-
-    print("Sorted array in descending:")
-    merge_sort_desc(arr, 0, (len(arr)-1))
-    for i in range(len(arr)):
-        print("%d" % arr[i], end=" ")

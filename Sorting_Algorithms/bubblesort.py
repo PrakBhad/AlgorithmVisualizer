@@ -19,17 +19,3 @@ def bubble_sort_desc(arr):
                 arr[j] , arr[j+1] = arr[j+1] , arr[j]
         if swapped == False:
             break
-
-if __name__ == "__main__":
-    arr = [64, 34, 25, 12, 22, 11, 90]
-
-    print("Sorted array in ascending:")
-    bubble_sort_asc(arr)
-    for i in range(len(arr)):
-        print("%d" % arr[i], end=" ")
-    print()        
-        
-    print("Sorted array in descending:")
-    bubble_sort_desc(arr)
-    for i in range(len(arr)):
-        print("%d" % arr[i], end=" ")
