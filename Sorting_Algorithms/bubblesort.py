@@ -8,6 +8,7 @@ def bubble_sort_asc(arr):
                 arr[j] , arr[j+1] = arr[j+1] , arr[j]
         if swapped == False:
             break
+    return arr
 
 def bubble_sort_desc(arr):
     n = len(arr)
@@ -19,3 +20,4 @@ def bubble_sort_desc(arr):
                 arr[j] , arr[j+1] = arr[j+1] , arr[j]
         if swapped == False:
             break
+    return arr

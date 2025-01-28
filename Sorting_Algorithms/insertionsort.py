@@ -7,6 +7,7 @@ def insertion_sort_asc(arr):
             arr[j+1] = arr[j]
             j-=1
         arr[j+1] = key
+    return arr
 
 def insertion_sort_desc(arr):
     n = len(arr)
@@ -17,3 +18,4 @@ def insertion_sort_desc(arr):
             arr[j+1] = arr[j]
             j-=1
         arr[j+1] = key
+    return arr

@@ -48,6 +48,7 @@ def merge_sort_asc(arr, left, right):
         merge_sort_asc(arr, left, mid)
         merge_sort_asc(arr, mid+1, right)
         merge_asc(arr, left, mid, right)
+    return arr
 
 
 def merge_desc(arr, left, mid, right):
@@ -100,3 +101,4 @@ def merge_sort_desc(arr, left, right):
         merge_sort_desc(arr, left, mid)
         merge_sort_desc(arr, mid+1, right)
         merge_desc(arr, left, mid, right)
+    return arr
