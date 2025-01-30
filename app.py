@@ -103,10 +103,15 @@ def main():
     rect = Rect()
     rects = pygame.sprite.Group()
     rects = rect.randomize(rects)
+    
     sort_generator = rect.bubble_sort_asc(rects)
     sort_generator_2 = rect.bubble_sort_desc(rects)
+    
     sorting = False
     sorting_desc = False
+    sorted_asc = False
+    sorted_desc = True
+    
     while running:
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
@@ -120,11 +125,38 @@ def main():
                         rects)  # Reset the generator
                     sort_generator_2 = rect.bubble_sort_desc(
                         rects)  # Reset the generator
+                    
                     sorting = False  # Stop sorting when randomizing
-                elif event.key == pygame.K_b:  # Bubble Sort Ascending
+                    sorting_desc = False 
+
+                elif event.key == pygame.K_b:  # Press 'b' to toggle ascending sort
+                    if sorting_desc:  # Stop ascending sort before starting descending sort
+                        sorting_desc = False
+                        sort_generator_2 = None  # Clear the generator
+
                     sorting = not sorting  # Toggle sorting on/off
-                elif event.key == pygame.K_n:  # Bubble Sort Descending
-                    sorting_desc = not sorting_desc  # Toggle sorting on/off
+                    sorting_desc = False  # Ensure descending sort is off
+                    
+                    if sorted_desc: # Re randomize it, temp fix
+                        rects = rect.randomize(rects)
+                    
+                    if sorting:
+                        sort_generator = rect.bubble_sort_asc(
+                            rects)  # Reset the generator
+
+                elif event.key == pygame.K_n:  # Press 'n' to toggle descending sort
+                    if sorting:  # Stop ascending sort before starting descending sort
+                        sorting = False
+                        sort_generator = None  # Clear the generator
+
+                    sorting_desc = not sorting_desc  # Toggle descending sort
+                    
+                    if sorted_asc: # Re randomize it, temp fix
+                        rects = rect.randomize(rects)
+                    
+                    if sorting_desc:
+                        sort_generator_2 = rect.bubble_sort_desc(
+                            rects)  # Reset the generator
 
         # Sorting logic (runs continuously when sorting is True)
         if sorting:
@@ -132,12 +164,14 @@ def main():
                 next(sort_generator)  # Advance the sorting algorithm
             except StopIteration:
                 sorting = False  # Sorting is complete
+                sorted_asc = True
 
         if sorting_desc:
             try:
                 next(sort_generator_2)  # Advance the sorting algorithm
             except StopIteration:
                 sorting = False  # Sorting is complete
+                sorted_desc = True
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
