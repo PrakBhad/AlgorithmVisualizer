@@ -33,15 +33,13 @@ def main():
     rect_width = 10  # Fixed width for rectangles
     spacing = 5  # Space between rectangles
 
-    arr = [random.randint(-100, 100) for i in range(100)]
-
-    for i in range(len(arr)):
+    arr = [random.randint(0, 500) for i in range(100)]
+    srt_arr = arr
+    for i in range(len(srt_arr)):
         if x + rect_width > screen_width:  # Width Check
             break
 
-        height = max(abs(arr[i]), height+arr[i])  # Height Check
-        if height >= screen_height-200:
-            height = abs(arr[i])
+        height = abs(srt_arr[i])  # Height Check
 
         rect = Rect(x=x, y=screen_height, height=height)
         rects.add(rect)
