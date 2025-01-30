@@ -121,9 +121,9 @@ def main():
                     sort_generator_2 = rect.bubble_sort_desc(
                         rects)  # Reset the generator
                     sorting = False  # Stop sorting when randomizing
-                elif event.key == pygame.K_b:
+                elif event.key == pygame.K_b:  # Bubble Sort Ascending
                     sorting = not sorting  # Toggle sorting on/off
-                elif event.key == pygame.K_d:
+                elif event.key == pygame.K_n:  # Bubble Sort Descending
                     sorting_desc = not sorting_desc  # Toggle sorting on/off
 
         # Sorting logic (runs continuously when sorting is True)
@@ -132,12 +132,12 @@ def main():
                 next(sort_generator)  # Advance the sorting algorithm
             except StopIteration:
                 sorting = False  # Sorting is complete
+
         if sorting_desc:
             try:
                 next(sort_generator_2)  # Advance the sorting algorithm
             except StopIteration:
                 sorting = False  # Sorting is complete
-
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
