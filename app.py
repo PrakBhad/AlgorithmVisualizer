@@ -31,7 +31,7 @@ class Rect(pygame.sprite.Sprite):
             if x + rect_width > screen_width:  # Width Check
                 break
             count = i+1
-            height = arr[i]  # Height Check
+            height = abs(arr[i])  # Height Check
 
             rect = Rect(x=x, y=screen_height, height=height,width=rect_width)
             rects.add(rect)
