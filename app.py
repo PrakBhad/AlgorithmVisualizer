@@ -20,19 +20,19 @@ class Rect(pygame.sprite.Sprite):
     @staticmethod
     def randomize(rects:pygame.sprite.Group):
         screen_width,screen_height = pygame.display.get_window_size()
-        rect_width = 10  # Fixed width for rectangles
+        rect_width = 10 # Fixed width for rectangles
         spacing = 5  # Space between rectangles 
         height = 0
-        x = 10
+        x = 20
         rects.empty()
         arr = [random.randint(30, 500) for i in range(100)]
         for i in range(len(arr)):
             if x + rect_width > screen_width:  # Width Check
                 break
-            
+            print(i+1)
             height = arr[i]  # Height Check
 
-            rect = Rect(x=x, y=screen_height, height=height)
+            rect = Rect(x=x, y=screen_height, height=height,width=rect_width)
             rects.add(rect)
             x += rect.image.get_width()+spacing #Spacing
         return rects
@@ -40,7 +40,7 @@ class Rect(pygame.sprite.Sprite):
 def main():
     pygame.init()
     screen = pygame.display.set_mode(
-        (1280, 720), flags=DOUBLEBUF)
+        (1520, 860), flags=DOUBLEBUF)
     clock = pygame.time.Clock()
     running = True
     
