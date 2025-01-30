@@ -22,7 +22,7 @@ class Rect(pygame.sprite.Sprite):
         x = 20
         rects.empty()
         count = 0
-        arr = [random.randint(75, 500) for i in range(100)]
+        arr = [random.randint(120, 550) for i in range(100)]
         for i in range(len(arr)):
             if x + rect_width > screen_width:  # Width Check
                 break
@@ -133,30 +133,30 @@ def main():
                     if sorting_desc:  # Stop ascending sort before starting descending sort
                         sorting_desc = False
                         sort_generator_2 = None  # Clear the generator
-
-                    sorting = not sorting  # Toggle sorting on/off
-                    sorting_desc = False  # Ensure descending sort is off
-                    
-                    if sorted_desc: # Re randomize it, temp fix
-                        rects = rect.randomize(rects)
-                    
-                    if sorting:
-                        sort_generator = rect.bubble_sort_asc(
-                            rects)  # Reset the generator
+                    else:
+                        sorting = not sorting  # Toggle sorting on/off
+                        sorting_desc = False  # Ensure descending sort is off
+                        
+                        if sorted_desc: # Re randomize it, temp fix
+                            rects = rect.randomize(rects)
+                        
+                        if sorting:
+                            sort_generator = rect.bubble_sort_asc(
+                                rects)  # Reset the generator
 
                 elif event.key == pygame.K_n:  # Press 'n' to toggle descending sort
                     if sorting:  # Stop ascending sort before starting descending sort
                         sorting = False
                         sort_generator = None  # Clear the generator
-
-                    sorting_desc = not sorting_desc  # Toggle descending sort
-                    
-                    if sorted_asc: # Re randomize it, temp fix
-                        rects = rect.randomize(rects)
-                    
-                    if sorting_desc:
-                        sort_generator_2 = rect.bubble_sort_desc(
-                            rects)  # Reset the generator
+                    else:
+                        sorting_desc = not sorting_desc  # Toggle descending sort
+                        
+                        if sorted_asc: # Re randomize it, temp fix
+                            rects = rect.randomize(rects)
+                        
+                        if sorting_desc:
+                            sort_generator_2 = rect.bubble_sort_desc(
+                                rects)  # Reset the generator
 
         # Sorting logic (runs continuously when sorting is True)
         if sorting:
