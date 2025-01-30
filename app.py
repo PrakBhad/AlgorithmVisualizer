@@ -7,7 +7,7 @@ from pygame.locals import *
 import random
 
 class Rect(pygame.sprite.Sprite):
-    def __init__(self, x=100, y=0, width=100, height=300, color=(0, 255, 0), value=10):
+    def __init__(self, x=100, y=0, width=100, height=500, color=(0, 255, 0), value=10):
         super().__init__()
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
@@ -24,14 +24,14 @@ def main():
     
     rects = pygame.sprite.Group()
     x=0
-    height = 100
-    arr= [random.randint(-100,100) for i in range(100)]
+    height = 500
+    arr= [random.randint(-200,200) for i in range(100)]
     
     for i in range(len(arr)):
             rect = Rect(x=x,y=screen.get_height()//2,height=height) #Centered the rectangles
             rects.add(rect)
             x+=rect.image.get_width()+20
-            height=100+arr[i]
+            height=max(100,rect.image.get_height()+arr[i])
     
     while running:
         # poll for events
