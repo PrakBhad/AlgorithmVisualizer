@@ -35,11 +35,12 @@ def main():
 
     arr = [random.randint(0, 500) for i in range(100)]
     srt_arr = arr
+    
     for i in range(len(srt_arr)):
         if x + rect_width > screen_width:  # Width Check
             break
 
-        height = abs(srt_arr[i])  # Height Check
+        height = srt_arr[i]  # Height Check
 
         rect = Rect(x=x, y=screen_height, height=height)
         rects.add(rect)
