@@ -36,17 +36,17 @@ def main():
     arr = [random.randint(-100, 100) for i in range(100)]
 
     for i in range(len(arr)):
-        # Centered the rectangles
-        if x + rect_width > screen_width:
+        if x + rect_width > screen_width:  # Width Check
             break
 
-        height = max(abs(arr[i]), height+arr[i])
-        if height >= screen_height:
+        height = max(abs(arr[i]), height+arr[i])  # Height Check
+        if height >= screen_height-200:
             height = abs(arr[i])
-            
+
         rect = Rect(x=x, y=screen_height, height=height)
         rects.add(rect)
-        x += rect.image.get_width()+spacing
+        
+        x += rect.image.get_width()+spacing #Spacing
 
     while running:
         # poll for events
