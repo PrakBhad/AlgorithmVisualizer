@@ -25,16 +25,18 @@ class Rect(pygame.sprite.Sprite):
         height = 0
         x = 20
         rects.empty()
+        count = 0
         arr = [random.randint(30, 500) for i in range(100)]
         for i in range(len(arr)):
             if x + rect_width > screen_width:  # Width Check
                 break
-            print(i+1)
+            count = i+1
             height = arr[i]  # Height Check
 
             rect = Rect(x=x, y=screen_height, height=height,width=rect_width)
             rects.add(rect)
             x += rect.image.get_width()+spacing #Spacing
+        print(count)
         return rects
 
 def main():
