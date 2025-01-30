@@ -25,7 +25,7 @@ class Rect(pygame.sprite.Sprite):
         height = 0
         x = 10
         rects.empty()
-        arr = [random.randint(0, 500) for i in range(100)]
+        arr = [random.randint(30, 500) for i in range(100)]
         for i in range(len(arr)):
             if x + rect_width > screen_width:  # Width Check
                 break
@@ -35,7 +35,6 @@ class Rect(pygame.sprite.Sprite):
             rect = Rect(x=x, y=screen_height, height=height)
             rects.add(rect)
             x += rect.image.get_width()+spacing #Spacing
-        arr = []
         return rects
 
 def main():
