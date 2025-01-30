@@ -109,8 +109,7 @@ def main():
     
     sorting = False
     sorting_desc = False
-    sorted_asc = False
-    sorted_desc = True
+    paused = False
     
     while running:
         # poll for events
@@ -136,9 +135,9 @@ def main():
                     else:
                         sorting = not sorting  # Toggle sorting on/off
                         sorting_desc = False  # Ensure descending sort is off
+                        paused = False
                         
-                        if sorted_desc: # Re randomize it, temp fix
-                            rects = rect.randomize(rects)
+                        rects = rect.randomize(rects)
                         
                         if sorting:
                             sort_generator = rect.bubble_sort_asc(
@@ -150,28 +149,30 @@ def main():
                         sort_generator = None  # Clear the generator
                     else:
                         sorting_desc = not sorting_desc  # Toggle descending sort
-                        
-                        if sorted_asc: # Re randomize it, temp fix
-                            rects = rect.randomize(rects)
+                        paused = False
+                        rects = rect.randomize(rects)
                         
                         if sorting_desc:
                             sort_generator_2 = rect.bubble_sort_desc(
                                 rects)  # Reset the generator
+                            
+                elif event.key== pygame.K_SPACE:
+                    paused = not paused
 
         # Sorting logic (runs continuously when sorting is True)
-        if sorting:
-            try:
-                next(sort_generator)  # Advance the sorting algorithm
-            except StopIteration:
-                sorting = False  # Sorting is complete
-                sorted_asc = True
-
-        if sorting_desc:
-            try:
-                next(sort_generator_2)  # Advance the sorting algorithm
-            except StopIteration:
-                sorting = False  # Sorting is complete
-                sorted_desc = True
+        if not paused:
+            if sorting:
+                try:
+                    next(sort_generator)  # Advance the sorting algorithm
+                except StopIteration:
+                    sorting = False  # Sorting is complete
+        
+        if not paused:
+            if sorting_desc:
+                try:
+                    next(sort_generator_2)  # Advance the sorting algorithm
+                except StopIteration:
+                    sorting = False  # Sorting is complete
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
