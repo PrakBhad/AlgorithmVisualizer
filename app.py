@@ -18,17 +18,17 @@ class Rect(pygame.sprite.Sprite):
 def main():
     pygame.init()
     screen = pygame.display.set_mode(
-        (1280, 720), flags=DOUBLEBUF | pygame.RESIZABLE)
+        (1280, 720), flags=DOUBLEBUF)
     clock = pygame.time.Clock()
     running = True
     
     rects = pygame.sprite.Group()
-    x=0
+    x=50
     height = 500
     arr= [random.randint(-200,200) for i in range(100)]
     
     for i in range(len(arr)):
-            rect = Rect(x=x,y=screen.get_height()//2,height=height) #Centered the rectangles
+            rect = Rect(x=x,y=screen.get_height(),height=height) #Centered the rectangles
             rects.add(rect)
             x+=rect.image.get_width()+20
             height=max(100,rect.image.get_height()+arr[i])
