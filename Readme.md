@@ -3,8 +3,7 @@
 This project is a sorting algorithm visualizer built using Python and Pygame. It allows you to visualize various sorting algorithms in real-time, with customizable settings such as FPS and sorting modes.
 
 ## Step 1: Setting Up Environment
-
-### Create a Conda Environment
+Create a Conda Environment
 To create a new Conda environment for this project, use the following command:
 
 ```sh
