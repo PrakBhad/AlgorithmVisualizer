@@ -44,3 +44,6 @@ python app.py
 ### FPS Adjustment:
 
 To change the FPS in comparison mode, modify the values within the `elif event.key == pygame.K_c:` block and also within the `def main` function in `app.py`.
+
+## **Licence**
+[MIT Licence](LICENCE)
