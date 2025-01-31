@@ -12,7 +12,7 @@ class Rect(pygame.sprite.Sprite):
         # Fetch the rectangle object that has the dimensions of the image
         # Update the position of this object by setting the values of rect.x and rect.y
         self.rect = self.image.get_rect(midbottom=(x, y))
-    
+
     @staticmethod
     def randomize(rects: pygame.sprite.Group):
         screen_width, screen_height = pygame.display.get_window_size()
@@ -35,24 +35,26 @@ class Rect(pygame.sprite.Sprite):
         print(count)
         return rects
 
+
+class SoringAlgorithm:
     @staticmethod
     def bubble_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
         sprite_list = rects.sprites()
         n = len(sprite_list)
-        
+
         for sprite in sprite_list:
-            sprite.image.fill((0,255,0))
-            
+            sprite.image.fill((0, 255, 0))
+
         for i in range(n):
             swapped = False
             for j in range(0, n - i - 1):
                 sp1 = sprite_list[j].image.get_height()
                 sp2 = sprite_list[j + 1].image.get_height()
-                
+
                 if cmpmode:
-                    sprite_list[j].image.fill((255,0,0))
-                    sprite_list[j+1].image.fill((255,0,0))
-                
+                    sprite_list[j].image.fill((255, 0, 0))
+                    sprite_list[j+1].image.fill((255, 0, 0))
+
                 if (sp1 > sp2) if ascending else (sp1 < sp2):
                     swapped = True
                     sprite_list[j], sprite_list[j +
@@ -60,15 +62,14 @@ class Rect(pygame.sprite.Sprite):
                     sprite_list[j].rect.x, sprite_list[j +
                                                        1].rect.x = sprite_list[j + 1].rect.x, sprite_list[j].rect.x
                     yield
-                    
+
                 if cmpmode:
                     for sprite in sprite_list:
-                        sprite.image.fill((0,255,0))
+                        sprite.image.fill((0, 255, 0))
             if not swapped:
                 break
         yield
 
-    @staticmethod
     @staticmethod
     def insertion_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
         sprite_list = rects.sprites()
@@ -80,32 +81,33 @@ class Rect(pygame.sprite.Sprite):
             key_sprite = sprite_list[i]
             key_height = key_sprite.image.get_height()
             j = i - 1
-            
+
             if cmpmode:
                 key_sprite.image.fill((255, 0, 0))  # Red color
                 yield
-            
+
             while j >= 0 and ((sprite_list[j].image.get_height() > key_height) if ascending else (sprite_list[j].image.get_height() < key_height)):
                 if cmpmode:
                     sprite_list[j].image.fill((255, 0, 0))  # Red color
                     yield
                     sprite_list[j].image.fill((0, 255, 0))  # Green color
-                
+
                 sprite_list[j + 1] = sprite_list[j]
                 j -= 1
                 yield
-            
+
             sprite_list[j + 1] = key_sprite
-            
+
             # Update positions of all sprites
             for index, sprite in enumerate(sprite_list):
-                sprite.rect.x = left_padding + index * (sprite.rect.width + spacing)
-            
+                sprite.rect.x = left_padding + index * \
+                    (sprite.rect.width + spacing)
+
             if cmpmode:
                 key_sprite.image.fill((255, 0, 0))  # Red color
                 yield
                 key_sprite.image.fill((0, 255, 0))  # Green color
-            
+
             yield
         yield
 
@@ -120,19 +122,20 @@ def main():
     rect = Rect()
     rects = pygame.sprite.Group()
     rects = rect.randomize(rects)
-
+    
+    sorter = SoringAlgorithm()
     sort_generator = None
     sorting_bubble = False
     sorting_insertion = False
     sort_ascending = True  # True for ascending, False for descending
-    
+
     cmpmode = False
-    
+
     if cmpmode:
-        fps = 5
+        fps = 10
     else:
         fps = 600
-        
+
     paused = False
 
     while running:
@@ -150,32 +153,32 @@ def main():
                     sorting_bubble = not sorting_bubble
                     if sorting_bubble:
                         rects = rect.randomize(rects)
-                        sort_generator = rect.bubble_sort(
-                            rects, sort_ascending,cmpmode)
+                        sort_generator = sorter.bubble_sort(
+                            rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_i:  # Toggle insertion sort
                     sorting_bubble = False
                     sorting_insertion = not sorting_insertion
                     if sorting_insertion:
                         rects = rect.randomize(rects)
-                        sort_generator = rect.insertion_sort(
-                            rects, sort_ascending,cmpmode)
+                        sort_generator = sorter.insertion_sort(
+                            rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_d:  # Toggle between ascending and descending
                     sort_ascending = not sort_ascending
                     if sorting_bubble or sorting_insertion:
                         rects = rect.randomize(rects)
                         if sorting_bubble:
-                            sort_generator = rect.bubble_sort(
+                            sort_generator = sorter.bubble_sort(
                                 rects, sort_ascending)
                         else:
-                            sort_generator = rect.insertion_sort(
+                            sort_generator = sorter.insertion_sort(
                                 rects, sort_ascending)
-                            
+
                 elif event.key == pygame.K_c:
                     cmpmode = not cmpmode
                     if cmpmode:
-                        fps = 5
+                        fps = 10
                     else:
                         fps = 600
 
