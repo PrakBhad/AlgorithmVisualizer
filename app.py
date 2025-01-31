@@ -73,7 +73,7 @@ class Rect(pygame.sprite.Sprite):
     def insertion_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
         sprite_list = rects.sprites()
         n = len(sprite_list)
-        left_padding = 20
+        left_padding = 10
         spacing = 5
 
         for i in range(1, n):
@@ -84,7 +84,6 @@ class Rect(pygame.sprite.Sprite):
             if cmpmode:
                 key_sprite.image.fill((255, 0, 0))  # Red color
                 yield
-                key_sprite.image.fill((0, 255, 0))  # Green color
             
             while j >= 0 and ((sprite_list[j].image.get_height() > key_height) if ascending else (sprite_list[j].image.get_height() < key_height)):
                 if cmpmode:
