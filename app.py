@@ -109,6 +109,58 @@ class SoringAlgorithm:
                 key_sprite.image.fill((0, 255, 0))  # Green color
 
             yield
+
+        yield
+
+    @staticmethod
+    def selection_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
+        sprite_list = rects.sprites()
+        n = len(sprite_list)
+        left_padding = 10
+        spacing = 5
+        
+        if cmpmode:
+            original_colors = [sprite.image.get_at((0, 0)) for sprite in sprite_list]
+            
+        for i in range(n-1):
+            min_idx = i
+            if cmpmode:
+                sprite_list[min_idx].image.fill((255, 0, 0))
+                
+            for j in range(i+1, n):
+                sp1 = sprite_list[j].image.get_height()
+                sp2 = sprite_list[min_idx].image.get_height()
+                
+                if cmpmode:
+                    sprite_list[j].image.fill((255, 0, 0))  # Red for comparison
+                    yield
+                    sprite_list[j].image.fill(original_colors[j])
+                
+                if (sp1 < sp2) if ascending else (sp1 > sp2):
+                    if cmpmode:
+                        sprite_list[min_idx].image.fill(original_colors[min_idx])
+                        
+                    min_idx = j
+                    
+                    if cmpmode:
+                        sprite_list[min_idx].image.fill((255, 0, 0))
+
+                yield
+            
+            if min_idx != i:
+                sprite_list[i], sprite_list[min_idx] = sprite_list[min_idx], sprite_list[i]
+                if cmpmode:
+                    original_colors[i], original_colors[min_idx] = original_colors[min_idx], original_colors[i]
+                    sprite_list[i].image.fill((0, 255, 0))
+                    
+            # Update positions of all sprites
+            for index, sprite in enumerate(sprite_list):
+                sprite.rect.x = left_padding + index * \
+                    (sprite.rect.width + spacing)
+            yield
+        if cmpmode:
+            for sprite in sprite_list:
+                sprite.image.fill((0, 255, 0))
         yield
 
 
@@ -120,19 +172,21 @@ def main():
     running = True
 
     rect = Rect()
+    sorter = SoringAlgorithm()
     rects = pygame.sprite.Group()
     rects = rect.randomize(rects)
-    
-    sorter = SoringAlgorithm()
+
     sort_generator = None
     sorting_bubble = False
     sorting_insertion = False
+    sorting_selection = False
     sort_ascending = True  # True for ascending, False for descending
 
     cmpmode = False
-
+    
+    fps = 600
     if cmpmode:
-        fps = 10
+        fps = 15
     else:
         fps = 600
 
@@ -150,6 +204,7 @@ def main():
 
                 elif event.key == pygame.K_b:  # Toggle bubble sort
                     sorting_insertion = False
+                    sorting_selection = False
                     sorting_bubble = not sorting_bubble
                     if sorting_bubble:
                         rects = rect.randomize(rects)
@@ -158,10 +213,20 @@ def main():
 
                 elif event.key == pygame.K_i:  # Toggle insertion sort
                     sorting_bubble = False
+                    sorting_selection = False
                     sorting_insertion = not sorting_insertion
                     if sorting_insertion:
                         rects = rect.randomize(rects)
                         sort_generator = sorter.insertion_sort(
+                            rects, sort_ascending, cmpmode)
+
+                elif event.key == pygame.K_s:  # Toggle insertion sort
+                    sorting_bubble = False
+                    sorting_insertion = False
+                    sorting_selection = not sorting_selection
+                    if sorting_selection:
+                        rects = rect.randomize(rects)
+                        sort_generator = sorter.selection_sort(
                             rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_d:  # Toggle between ascending and descending
@@ -178,7 +243,7 @@ def main():
                 elif event.key == pygame.K_c:
                     cmpmode = not cmpmode
                     if cmpmode:
-                        fps = 10
+                        fps = 15
                     else:
                         fps = 600
 
@@ -187,11 +252,11 @@ def main():
 
         # Sorting logic (runs continuously when sorting is True and not paused)
         if not paused:
-            if (sorting_bubble or sorting_insertion) and sort_generator is not None:
+            if (sorting_bubble or sorting_insertion or sorting_selection) and sort_generator is not None:
                 try:
                     next(sort_generator)
                 except StopIteration:
-                    sorting_bubble = sorting_insertion = False
+                    sorting_bubble = sorting_insertion = sorting_selection = False
                     sort_generator = None
 
         # Fill the screen with a color to wipe away anything from last frame
@@ -199,7 +264,7 @@ def main():
         rects.draw(screen)  # Draw rectangles onto screen
 
         pygame.display.flip()  # Flip the display to put your work on screen
-        clock.tick(fps)  # Limit FPS to 60
+        clock.tick(fps)
 
     pygame.quit()
 
