@@ -22,7 +22,7 @@ class Rect(pygame.sprite.Sprite):
         x = 20
         rects.empty()
         count = 0
-        arr = [random.randint(120, 550) for i in range(100)]
+        arr = [random.randint(120, 500) for i in range(100)]
         for i in range(len(arr)):
             if x + rect_width > screen_width:  # Width Check
                 break
@@ -36,7 +36,7 @@ class Rect(pygame.sprite.Sprite):
         return rects
 
     @staticmethod
-    def bubble_sort_asc(rects: pygame.sprite.Group):
+    def bubble_sort(rects: pygame.sprite.Group, ascending: bool = True):
         sprite_list = rects.sprites()
         n = len(sprite_list)
         for i in range(n):
@@ -44,142 +44,105 @@ class Rect(pygame.sprite.Sprite):
             for j in range(0, n - i - 1):
                 sp1 = sprite_list[j].image.get_height()
                 sp2 = sprite_list[j + 1].image.get_height()
-                if sp1 > sp2:
+                if (sp1 > sp2) if ascending else (sp1 < sp2):
                     swapped = True
-                    # Swap the sprites in the list
-                    sprite_list[j], sprite_list[j +
-                                                1] = sprite_list[j + 1], sprite_list[j]
-
-                    # Swap the x positions of the sprites
-                    temp_x = sprite_list[j].rect.x
-                    sprite_list[j].rect.x = sprite_list[j + 1].rect.x
-                    sprite_list[j + 1].rect.x = temp_x
-
-                    # Yield control back to the main loop to update the display
+                    sprite_list[j], sprite_list[j + 1] = sprite_list[j + 1], sprite_list[j]
+                    sprite_list[j].rect.x, sprite_list[j + 1].rect.x = sprite_list[j + 1].rect.x, sprite_list[j].rect.x
                     yield
-
             if not swapped:
                 break
-
-        # Final yield to indicate sorting is complete
         yield
 
     @staticmethod
-    def bubble_sort_desc(rects: pygame.sprite.Group):
+    def insertion_sort(rects: pygame.sprite.Group, ascending: bool = True):
         sprite_list = rects.sprites()
         n = len(sprite_list)
-        for i in range(n):
-            swapped = False
-            for j in range(0, n - i - 1):
-                sp1 = sprite_list[j].image.get_height()
-                sp2 = sprite_list[j + 1].image.get_height()
-                if sp1 < sp2:
-                    swapped = True
-                    # Swap the sprites in the list
-                    sprite_list[j], sprite_list[j +
-                                                1] = sprite_list[j + 1], sprite_list[j]
-
-                    # Swap the x positions of the sprites
-                    temp_x = sprite_list[j].rect.x
-                    sprite_list[j].rect.x = sprite_list[j + 1].rect.x
-                    sprite_list[j + 1].rect.x = temp_x
-
-                    # Yield control back to the main loop to update the display
-                    yield
-
-            if not swapped:
-                break
-
-        # Final yield to indicate sorting is complete
+        for i in range(1, n):
+            key_sprite = sprite_list[i]
+            key_height = key_sprite.image.get_height()
+            j = i - 1
+            while j >= 0 and ((sprite_list[j].image.get_height() > key_height) if ascending else (sprite_list[j].image.get_height() < key_height)):
+                sprite_list[j + 1] = sprite_list[j]
+                sprite_list[j + 1].rect.x = (j + 1) * (sprite_list[j].rect.width + 5) + 20
+                j -= 1
+                yield
+            sprite_list[j + 1] = key_sprite
+            sprite_list[j + 1].rect.x = (j + 1) * (key_sprite.rect.width + 5) + 20
+            yield
         yield
+
 
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF)
+    pygame.display.set_caption("Algorithm Visualizer")
     clock = pygame.time.Clock()
     running = True
 
     rect = Rect()
     rects = pygame.sprite.Group()
     rects = rect.randomize(rects)
-    
-    sort_generator = rect.bubble_sort_asc(rects)
-    sort_generator_2 = rect.bubble_sort_desc(rects)
-    
-    sorting = False
-    sorting_desc = False
+
+    sort_generator = None
+    sorting_bubble = False
+    sorting_insertion = False
+    sort_ascending = True  # True for ascending, False for descending
     paused = False
-    
+
     while running:
-        # poll for events
-        # pygame.QUIT event means the user clicked X to close your window
+        # Poll for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:  # Press r to randomize
+                if event.key == pygame.K_r:  # Press 'r' to randomize
                     rects = rect.randomize(rects)
-                    sort_generator = rect.bubble_sort_asc(
-                        rects)  # Reset the generator
-                    sort_generator_2 = rect.bubble_sort_desc(
-                        rects)  # Reset the generator
-                    
-                    sorting = False  # Stop sorting when randomizing
-                    sorting_desc = False 
+                    paused = False
 
-                elif event.key == pygame.K_b:  # Press 'b' to toggle ascending sort
-                    if sorting_desc:  # Stop ascending sort before starting descending sort
-                        sorting_desc = False
-                        sort_generator_2 = None  # Clear the generator
-                    else:
-                        sorting = not sorting  # Toggle sorting on/off
-                        sorting_desc = False  # Ensure descending sort is off
-                        paused = False
-                        
+                elif event.key == pygame.K_b:  # Toggle bubble sort
+                    sorting_insertion = False
+                    sorting_bubble = not sorting_bubble
+                    if sorting_bubble:
                         rects = rect.randomize(rects)
-                        
-                        if sorting:
-                            sort_generator = rect.bubble_sort_asc(
-                                rects)  # Reset the generator
+                        sort_generator = rect.bubble_sort(rects, sort_ascending)
 
-                elif event.key == pygame.K_n:  # Press 'n' to toggle descending sort
-                    if sorting:  # Stop ascending sort before starting descending sort
-                        sorting = False
-                        sort_generator = None  # Clear the generator
-                    else:
-                        sorting_desc = not sorting_desc  # Toggle descending sort
-                        paused = False
+                elif event.key == pygame.K_i:  # Toggle insertion sort
+                    sorting_bubble = False
+                    sorting_insertion = not sorting_insertion
+                    if sorting_insertion:
                         rects = rect.randomize(rects)
-                        
-                        if sorting_desc:
-                            sort_generator_2 = rect.bubble_sort_desc(
-                                rects)  # Reset the generator
+                        sort_generator = rect.insertion_sort(rects, sort_ascending)
+
+                elif event.key == pygame.K_d:  # Toggle between ascending and descending
+                    sort_ascending = not sort_ascending
+                    if sorting_bubble or sorting_insertion:
+                        rects = rect.randomize(rects)
+                        if sorting_bubble:
+                            sort_generator = rect.bubble_sort(rects, sort_ascending)
+                        else:
+                            sort_generator = rect.insertion_sort(rects, sort_ascending)
                             
-                elif event.key== pygame.K_SPACE:
+                elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
                     paused = not paused
 
-        # Sorting logic (runs continuously when sorting is True)
+        # Sorting logic (runs continuously when sorting is True and not paused)
         if not paused:
-            if sorting:
+            if (sorting_bubble or sorting_insertion) and sort_generator is not None:
                 try:
-                    next(sort_generator)  # Advance the sorting algorithm
+                    next(sort_generator)
                 except StopIteration:
-                    sorting = False  # Sorting is complete
-        
-        if not paused:
-            if sorting_desc:
-                try:
-                    next(sort_generator_2)  # Advance the sorting algorithm
-                except StopIteration:
-                    sorting = False  # Sorting is complete
+                    sorting_bubble = sorting_insertion = False
+                    sort_generator = None
 
-        # fill the screen with a color to wipe away anything from last frame
+
+
+        # Fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
         rects.draw(screen)  # Draw rectangles onto screen
 
-        pygame.display.flip()  # flip() the display to put your work on screen
-        clock.tick(600)  # limits FPS to 60
+        pygame.display.flip()  # Flip the display to put your work on screen
+        clock.tick(600)  # Limit FPS to 60
 
     pygame.quit()
 
