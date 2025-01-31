@@ -43,7 +43,10 @@ python app.py
 
 ### FPS Adjustment:
 
-To change the FPS in comparison mode, modify the values within the `elif event.key == pygame.K_c:` block and also within the `def main` function in `app.py`.
+To change the FPS values in each mode, change the return values in `function_toggler`.
+Current Values:
+Compare mode: 15
+Sorting mode: 600
 
 ## **Licence**
 [MIT Licence](LICENSE)
