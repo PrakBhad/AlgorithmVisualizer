@@ -59,21 +59,23 @@ class Rect(pygame.sprite.Sprite):
     def insertion_sort(rects: pygame.sprite.Group, ascending: bool = True):
         sprite_list = rects.sprites()
         n = len(sprite_list)
+        left_padding = 10
         for i in range(1, n):
             key_sprite = sprite_list[i]
             key_height = key_sprite.image.get_height()
             j = i - 1
             while j >= 0 and ((sprite_list[j].image.get_height() > key_height) if ascending else (sprite_list[j].image.get_height() < key_height)):
                 sprite_list[j + 1] = sprite_list[j]
-                sprite_list[j + 1].rect.x = (j + 1) * \
-                    (sprite_list[j].rect.width + 5) + 20
+                sprite_list[j + 1].rect.x = left_padding+(j + 1) * \
+                    (sprite_list[j].rect.width + 5)
                 j -= 1
                 yield
             sprite_list[j + 1] = key_sprite
-            sprite_list[j + 1].rect.x = (j + 1) * \
-                (key_sprite.rect.width + 5) + 20
+            sprite_list[j + 1].rect.x = left_padding+(j + 1) * \
+                (key_sprite.rect.width + 5) 
             yield
         yield
+        
 
 
 def main():
