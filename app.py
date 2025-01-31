@@ -248,8 +248,9 @@ def main():
                                 rects, sort_ascending,cmpmode)
 
                 elif event.key == pygame.K_c:
-                    cmpmode = not cmpmode
-                    fps = displayer.fps_toggler(cmpmode)
+                    if not (sorting_bubble or sorting_insertion or sorting_selection):
+                        cmpmode = not cmpmode
+                        fps = displayer.fps_toggler(cmpmode)
 
                 elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
                     paused = not paused
