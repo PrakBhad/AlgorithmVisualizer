@@ -46,8 +46,10 @@ class Rect(pygame.sprite.Sprite):
                 sp2 = sprite_list[j + 1].image.get_height()
                 if (sp1 > sp2) if ascending else (sp1 < sp2):
                     swapped = True
-                    sprite_list[j], sprite_list[j + 1] = sprite_list[j + 1], sprite_list[j]
-                    sprite_list[j].rect.x, sprite_list[j + 1].rect.x = sprite_list[j + 1].rect.x, sprite_list[j].rect.x
+                    sprite_list[j], sprite_list[j +
+                                                1] = sprite_list[j + 1], sprite_list[j]
+                    sprite_list[j].rect.x, sprite_list[j +
+                                                       1].rect.x = sprite_list[j + 1].rect.x, sprite_list[j].rect.x
                     yield
             if not swapped:
                 break
@@ -63,14 +65,15 @@ class Rect(pygame.sprite.Sprite):
             j = i - 1
             while j >= 0 and ((sprite_list[j].image.get_height() > key_height) if ascending else (sprite_list[j].image.get_height() < key_height)):
                 sprite_list[j + 1] = sprite_list[j]
-                sprite_list[j + 1].rect.x = (j + 1) * (sprite_list[j].rect.width + 5) + 20
+                sprite_list[j + 1].rect.x = (j + 1) * \
+                    (sprite_list[j].rect.width + 5) + 20
                 j -= 1
                 yield
             sprite_list[j + 1] = key_sprite
-            sprite_list[j + 1].rect.x = (j + 1) * (key_sprite.rect.width + 5) + 20
+            sprite_list[j + 1].rect.x = (j + 1) * \
+                (key_sprite.rect.width + 5) + 20
             yield
         yield
-
 
 
 def main():
@@ -105,24 +108,28 @@ def main():
                     sorting_bubble = not sorting_bubble
                     if sorting_bubble:
                         rects = rect.randomize(rects)
-                        sort_generator = rect.bubble_sort(rects, sort_ascending)
+                        sort_generator = rect.bubble_sort(
+                            rects, sort_ascending)
 
                 elif event.key == pygame.K_i:  # Toggle insertion sort
                     sorting_bubble = False
                     sorting_insertion = not sorting_insertion
                     if sorting_insertion:
                         rects = rect.randomize(rects)
-                        sort_generator = rect.insertion_sort(rects, sort_ascending)
+                        sort_generator = rect.insertion_sort(
+                            rects, sort_ascending)
 
                 elif event.key == pygame.K_d:  # Toggle between ascending and descending
                     sort_ascending = not sort_ascending
                     if sorting_bubble or sorting_insertion:
                         rects = rect.randomize(rects)
                         if sorting_bubble:
-                            sort_generator = rect.bubble_sort(rects, sort_ascending)
+                            sort_generator = rect.bubble_sort(
+                                rects, sort_ascending)
                         else:
-                            sort_generator = rect.insertion_sort(rects, sort_ascending)
-                            
+                            sort_generator = rect.insertion_sort(
+                                rects, sort_ascending)
+
                 elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
                     paused = not paused
 
@@ -134,8 +141,6 @@ def main():
                 except StopIteration:
                     sorting_bubble = sorting_insertion = False
                     sort_generator = None
-
-
 
         # Fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
