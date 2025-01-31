@@ -125,8 +125,9 @@ class SoringAlgorithm:
         for i in range(n-1):
             min_idx = i
             if cmpmode:
-                sprite_list[min_idx].image.fill((255, 0, 0))
-                
+                sprite_list[min_idx].image.fill((255, 0, 0))  # Red for current minimum
+                yield
+            
             for j in range(i+1, n):
                 sp1 = sprite_list[j].image.get_height()
                 sp2 = sprite_list[min_idx].image.get_height()
@@ -139,29 +140,36 @@ class SoringAlgorithm:
                 if (sp1 < sp2) if ascending else (sp1 > sp2):
                     if cmpmode:
                         sprite_list[min_idx].image.fill(original_colors[min_idx])
-                        
                     min_idx = j
-                    
                     if cmpmode:
-                        sprite_list[min_idx].image.fill((255, 0, 0))
-
-                yield
-            
+                        sprite_list[min_idx].image.fill((255, 0, 0))  # Red for new minimum
+                        yield
+                
             if min_idx != i:
                 sprite_list[i], sprite_list[min_idx] = sprite_list[min_idx], sprite_list[i]
                 if cmpmode:
                     original_colors[i], original_colors[min_idx] = original_colors[min_idx], original_colors[i]
-                    sprite_list[i].image.fill((0, 255, 0))
-                    
+            
+            if cmpmode:
+                sprite_list[i].image.fill((0, 255, 0))  # Green for sorted position
+                yield
+            
             # Update positions of all sprites
             for index, sprite in enumerate(sprite_list):
-                sprite.rect.x = left_padding + index * \
-                    (sprite.rect.width + spacing)
+                sprite.rect.x = left_padding + index * (sprite.rect.width + spacing)
             yield
+        
+        # Ensure the last element is also colored green
         if cmpmode:
-            for sprite in sprite_list:
-                sprite.image.fill((0, 255, 0))
-        yield
+            sprite_list[-1].image.fill((0, 255, 0))
+            yield
+
+class Renderer:
+    def fps_toggler(self,cmpmode:bool):
+        if cmpmode:
+            return 15
+        else:
+            return 600
 
 
 def main():
@@ -181,15 +189,11 @@ def main():
     sorting_insertion = False
     sorting_selection = False
     sort_ascending = True  # True for ascending, False for descending
-
-    cmpmode = False
     
-    fps = 600
-    if cmpmode:
-        fps = 15
-    else:
-        fps = 600
-
+    cmpmode = False
+    displayer = Renderer()
+    fps = displayer.fps_toggler(cmpmode)
+    
     paused = False
 
     while running:
@@ -235,17 +239,17 @@ def main():
                         rects = rect.randomize(rects)
                         if sorting_bubble:
                             sort_generator = sorter.bubble_sort(
-                                rects, sort_ascending)
-                        else:
+                                rects, sort_ascending,cmpmode)
+                        elif sorting_insertion:
                             sort_generator = sorter.insertion_sort(
-                                rects, sort_ascending)
+                                rects, sort_ascending,cmpmode)
+                        elif sorting_selection:
+                            sort_generator = sorter.selection_sort(
+                                rects, sort_ascending,cmpmode)
 
                 elif event.key == pygame.K_c:
                     cmpmode = not cmpmode
-                    if cmpmode:
-                        fps = 15
-                    else:
-                        fps = 600
+                    fps = displayer.fps_toggler(cmpmode)
 
                 elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
                     paused = not paused
