@@ -164,7 +164,7 @@ class SoringAlgorithm:
             sprite_list[-1].image.fill((0, 255, 0))
             yield
 
-class Renderer:
+class Displayer:
     def fps_toggler(self,cmpmode:bool):
         if cmpmode:
             return 15
@@ -191,7 +191,7 @@ def main():
     sort_ascending = True  # True for ascending, False for descending
     
     cmpmode = False
-    displayer = Renderer()
+    displayer = Displayer()
     fps = displayer.fps_toggler(cmpmode)
     
     paused = False
