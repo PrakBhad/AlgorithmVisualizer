@@ -7,7 +7,6 @@ def bubble_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: boo
             sprite.image.fill((0, 255, 0))
 
         for i in range(n):
-            swapped = False
             for j in range(0, n - i - 1):
                 sp1 = sprite_list[j].image.get_height()
                 sp2 = sprite_list[j + 1].image.get_height()
@@ -17,7 +16,6 @@ def bubble_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: boo
                     sprite_list[j+1].image.fill((255, 0, 0))
 
                 if (sp1 > sp2) if ascending else (sp1 < sp2):
-                    swapped = True
                     sprite_list[j], sprite_list[j +
                                                 1] = sprite_list[j + 1], sprite_list[j]
                     sprite_list[j].rect.x, sprite_list[j +
@@ -27,6 +25,4 @@ def bubble_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: boo
                 if cmpmode:
                     for sprite in sprite_list:
                         sprite.image.fill((0, 255, 0))
-            if not swapped:
-                break
         yield
