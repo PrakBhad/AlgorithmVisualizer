@@ -12,7 +12,7 @@ def selection_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: 
             min_idx = i
             if cmpmode:
                 sprite_list[min_idx].image.fill((255, 0, 0))  # Red for current minimum
-                yield
+            yield
             
             for j in range(i+1, n):
                 sp1 = sprite_list[j].image.get_height()
@@ -20,7 +20,8 @@ def selection_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: 
                 
                 if cmpmode:
                     sprite_list[j].image.fill((255, 0, 0))  # Red for comparison
-                    yield
+                yield
+                if cmpmode:
                     sprite_list[j].image.fill(original_colors[j])
                 
                 if (sp1 < sp2) if ascending else (sp1 > sp2):
@@ -29,7 +30,7 @@ def selection_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: 
                     min_idx = j
                     if cmpmode:
                         sprite_list[min_idx].image.fill((255, 0, 0))  # Red for new minimum
-                        yield
+                    yield
                 
             if min_idx != i:
                 sprite_list[i], sprite_list[min_idx] = sprite_list[min_idx], sprite_list[i]
@@ -38,7 +39,7 @@ def selection_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: 
             
             if cmpmode:
                 sprite_list[i].image.fill((0, 255, 0))  # Green for sorted position
-                yield
+            yield
             
             # Update positions of all sprites
             for index, sprite in enumerate(sprite_list):
@@ -49,3 +50,4 @@ def selection_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: 
         if cmpmode:
             sprite_list[-1].image.fill((0, 255, 0))
             yield
+        yield
