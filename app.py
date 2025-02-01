@@ -1,3 +1,7 @@
+from Sorting_Algorithms.bubblesort import *
+from Sorting_Algorithms.insertionsort import *
+from Sorting_Algorithms.selectionsort import *
+
 import pygame
 from pygame.locals import *
 import random
@@ -36,133 +40,8 @@ class Rect(pygame.sprite.Sprite):
         return rects
 
 
-class SoringAlgorithm:
-    @staticmethod
-    def bubble_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
-        sprite_list = rects.sprites()
-        n = len(sprite_list)
-
-        for sprite in sprite_list:
-            sprite.image.fill((0, 255, 0))
-
-        for i in range(n):
-            swapped = False
-            for j in range(0, n - i - 1):
-                sp1 = sprite_list[j].image.get_height()
-                sp2 = sprite_list[j + 1].image.get_height()
-
-                if cmpmode:
-                    sprite_list[j].image.fill((255, 0, 0))
-                    sprite_list[j+1].image.fill((255, 0, 0))
-
-                if (sp1 > sp2) if ascending else (sp1 < sp2):
-                    swapped = True
-                    sprite_list[j], sprite_list[j +
-                                                1] = sprite_list[j + 1], sprite_list[j]
-                    sprite_list[j].rect.x, sprite_list[j +
-                                                       1].rect.x = sprite_list[j + 1].rect.x, sprite_list[j].rect.x
-                    yield
-
-                if cmpmode:
-                    for sprite in sprite_list:
-                        sprite.image.fill((0, 255, 0))
-            if not swapped:
-                break
-        yield
-
-    @staticmethod
-    def insertion_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
-        sprite_list = rects.sprites()
-        n = len(sprite_list)
-        left_padding = 10
-        spacing = 5
-
-        for i in range(1, n):
-            key_sprite = sprite_list[i]
-            key_height = key_sprite.image.get_height()
-            j = i - 1
-
-            if cmpmode:
-                key_sprite.image.fill((255, 0, 0))  # Red color
-                yield
-
-            while j >= 0 and ((sprite_list[j].image.get_height() > key_height) if ascending else (sprite_list[j].image.get_height() < key_height)):
-                if cmpmode:
-                    sprite_list[j].image.fill((255, 0, 0))  # Red color
-                    yield
-                    sprite_list[j].image.fill((0, 255, 0))  # Green color
-
-                sprite_list[j + 1] = sprite_list[j]
-                j -= 1
-                yield
-
-            sprite_list[j + 1] = key_sprite
-
-            # Update positions of all sprites
-            for index, sprite in enumerate(sprite_list):
-                sprite.rect.x = left_padding + index * \
-                    (sprite.rect.width + spacing)
-
-            if cmpmode:
-                key_sprite.image.fill((255, 0, 0))  # Red color
-                yield
-                key_sprite.image.fill((0, 255, 0))  # Green color
-
-            yield
-
-        yield
-
-    @staticmethod
-    def selection_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
-        sprite_list = rects.sprites()
-        n = len(sprite_list)
-        left_padding = 10
-        spacing = 5
-        
-        if cmpmode:
-            original_colors = [sprite.image.get_at((0, 0)) for sprite in sprite_list]
-            
-        for i in range(n-1):
-            min_idx = i
-            if cmpmode:
-                sprite_list[min_idx].image.fill((255, 0, 0))  # Red for current minimum
-                yield
-            
-            for j in range(i+1, n):
-                sp1 = sprite_list[j].image.get_height()
-                sp2 = sprite_list[min_idx].image.get_height()
-                
-                if cmpmode:
-                    sprite_list[j].image.fill((255, 0, 0))  # Red for comparison
-                    yield
-                    sprite_list[j].image.fill(original_colors[j])
-                
-                if (sp1 < sp2) if ascending else (sp1 > sp2):
-                    if cmpmode:
-                        sprite_list[min_idx].image.fill(original_colors[min_idx])
-                    min_idx = j
-                    if cmpmode:
-                        sprite_list[min_idx].image.fill((255, 0, 0))  # Red for new minimum
-                        yield
-                
-            if min_idx != i:
-                sprite_list[i], sprite_list[min_idx] = sprite_list[min_idx], sprite_list[i]
-                if cmpmode:
-                    original_colors[i], original_colors[min_idx] = original_colors[min_idx], original_colors[i]
-            
-            if cmpmode:
-                sprite_list[i].image.fill((0, 255, 0))  # Green for sorted position
-                yield
-            
-            # Update positions of all sprites
-            for index, sprite in enumerate(sprite_list):
-                sprite.rect.x = left_padding + index * (sprite.rect.width + spacing)
-            yield
-        
-        # Ensure the last element is also colored green
-        if cmpmode:
-            sprite_list[-1].image.fill((0, 255, 0))
-            yield
+class SortingAlgorithm:
+    """"""
 
 class Displayer:
     def fps_toggler(self,cmpmode:bool):
@@ -180,7 +59,6 @@ def main():
     running = True
 
     rect = Rect()
-    sorter = SoringAlgorithm()
     rects = pygame.sprite.Group()
     rects = rect.randomize(rects)
 
@@ -212,7 +90,7 @@ def main():
                     sorting_bubble = not sorting_bubble
                     if sorting_bubble:
                         rects = rect.randomize(rects)
-                        sort_generator = sorter.bubble_sort(
+                        sort_generator = bubble_sort(
                             rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_i:  # Toggle insertion sort
@@ -221,7 +99,7 @@ def main():
                     sorting_insertion = not sorting_insertion
                     if sorting_insertion:
                         rects = rect.randomize(rects)
-                        sort_generator = sorter.insertion_sort(
+                        sort_generator = insertion_sort(
                             rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_s:  # Toggle insertion sort
@@ -230,7 +108,7 @@ def main():
                     sorting_selection = not sorting_selection
                     if sorting_selection:
                         rects = rect.randomize(rects)
-                        sort_generator = sorter.selection_sort(
+                        sort_generator = selection_sort(
                             rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_d:  # Toggle between ascending and descending
@@ -238,13 +116,13 @@ def main():
                     if sorting_bubble or sorting_insertion:
                         rects = rect.randomize(rects)
                         if sorting_bubble:
-                            sort_generator = sorter.bubble_sort(
+                            sort_generator = bubble_sort(
                                 rects, sort_ascending,cmpmode)
                         elif sorting_insertion:
-                            sort_generator = sorter.insertion_sort(
+                            sort_generator = insertion_sort(
                                 rects, sort_ascending,cmpmode)
                         elif sorting_selection:
-                            sort_generator = sorter.selection_sort(
+                            sort_generator = selection_sort(
                                 rects, sort_ascending,cmpmode)
 
                 elif event.key == pygame.K_c:
