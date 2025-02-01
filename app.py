@@ -44,7 +44,8 @@ class SortingAlgorithm:
     """"""
 
 class Displayer:
-    def fps_toggler(self,cmpmode:bool):
+    @staticmethod
+    def fps_toggler(cmpmode:bool):
         if cmpmode:
             return 15
         else:
@@ -69,8 +70,7 @@ def main():
     sort_ascending = True  # True for ascending, False for descending
     
     cmpmode = False
-    displayer = Displayer()
-    fps = displayer.fps_toggler(cmpmode)
+    fps = Displayer.fps_toggler(cmpmode)
     
     paused = False
 
@@ -128,7 +128,7 @@ def main():
                 elif event.key == pygame.K_c:
                     if not (sorting_bubble or sorting_insertion or sorting_selection):
                         cmpmode = not cmpmode
-                        fps = displayer.fps_toggler(cmpmode)
+                        fps = Displayer.fps_toggler(cmpmode)
 
                 elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
                     paused = not paused
