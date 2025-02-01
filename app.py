@@ -82,6 +82,10 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:  # Press 'r' to randomize
                     rects = rect.randomize(rects)
+                    sort_generator = None
+                    sorting_bubble = False
+                    sorting_insertion = False
+                    sorting_selection = False
                     paused = False
 
                 elif event.key == pygame.K_b:  # Toggle bubble sort
