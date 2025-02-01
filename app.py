@@ -1,6 +1,7 @@
 from Sorting_Algorithms.bubblesort import *
 from Sorting_Algorithms.insertionsort import *
 from Sorting_Algorithms.selectionsort import *
+from Sorting_Algorithms.mergesort import *
 
 import pygame
 from pygame.locals import *
@@ -40,12 +41,9 @@ class Rect(pygame.sprite.Sprite):
         return rects
 
 
-class SortingAlgorithm:
-    """"""
-
 class Displayer:
     @staticmethod
-    def fps_toggler(cmpmode:bool):
+    def fps_toggler(cmpmode: bool):
         if cmpmode:
             return 15
         else:
@@ -67,11 +65,12 @@ def main():
     sorting_bubble = False
     sorting_insertion = False
     sorting_selection = False
+    sorting_merge = False
     sort_ascending = True  # True for ascending, False for descending
-    
+
     cmpmode = False
     fps = Displayer.fps_toggler(cmpmode)
-    
+
     paused = False
 
     while running:
@@ -86,11 +85,13 @@ def main():
                     sorting_bubble = False
                     sorting_insertion = False
                     sorting_selection = False
+                    sorting_merge = False
                     paused = False
 
                 elif event.key == pygame.K_b:  # Toggle bubble sort
                     sorting_insertion = False
                     sorting_selection = False
+                    sorting_merge = False
                     sorting_bubble = not sorting_bubble
                     if sorting_bubble:
                         rects = rect.randomize(rects)
@@ -100,19 +101,31 @@ def main():
                 elif event.key == pygame.K_i:  # Toggle insertion sort
                     sorting_bubble = False
                     sorting_selection = False
+                    sorting_merge = False
                     sorting_insertion = not sorting_insertion
                     if sorting_insertion:
                         rects = rect.randomize(rects)
                         sort_generator = insertion_sort(
                             rects, sort_ascending, cmpmode)
 
-                elif event.key == pygame.K_s:  # Toggle insertion sort
+                elif event.key == pygame.K_s:  # Toggle selection sort
                     sorting_bubble = False
                     sorting_insertion = False
+                    sorting_merge = False
                     sorting_selection = not sorting_selection
                     if sorting_selection:
                         rects = rect.randomize(rects)
                         sort_generator = selection_sort(
+                            rects, sort_ascending, cmpmode)
+
+                elif event.key == pygame.K_m:  # Toggle merge sort
+                    sorting_bubble = False
+                    sorting_insertion = False
+                    sorting_selection = False
+                    sorting_merge = not sorting_merge
+                    if sorting_merge:
+                        rects = rect.randomize(rects)
+                        sort_generator = merge_sort(
                             rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_d:  # Toggle between ascending and descending
@@ -121,16 +134,19 @@ def main():
                         rects = rect.randomize(rects)
                         if sorting_bubble:
                             sort_generator = bubble_sort(
-                                rects, sort_ascending,cmpmode)
+                                rects, sort_ascending, cmpmode)
                         elif sorting_insertion:
                             sort_generator = insertion_sort(
-                                rects, sort_ascending,cmpmode)
+                                rects, sort_ascending, cmpmode)
                         elif sorting_selection:
                             sort_generator = selection_sort(
-                                rects, sort_ascending,cmpmode)
+                                rects, sort_ascending, cmpmode)
+                        elif sorting_merge:
+                            sort_generator = merge_sort(
+                                rects, sort_ascending, cmpmode)
 
                 elif event.key == pygame.K_c:
-                    if not (sorting_bubble or sorting_insertion or sorting_selection):
+                    if not (sorting_bubble or sorting_insertion or sorting_selection or sorting_merge):
                         cmpmode = not cmpmode
                         fps = Displayer.fps_toggler(cmpmode)
 
@@ -139,11 +155,11 @@ def main():
 
         # Sorting logic (runs continuously when sorting is True and not paused)
         if not paused:
-            if (sorting_bubble or sorting_insertion or sorting_selection) and sort_generator is not None:
+            if (sorting_bubble or sorting_insertion or sorting_selection or sorting_merge) and sort_generator is not None:
                 try:
                     next(sort_generator)
                 except StopIteration:
-                    sorting_bubble = sorting_insertion = sorting_selection = False
+                    sorting_bubble = sorting_insertion = sorting_merge = sorting_selection = False
                     sort_generator = None
 
         # Fill the screen with a color to wipe away anything from last frame
