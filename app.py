@@ -45,7 +45,7 @@ class Displayer:
     @staticmethod
     def fps_toggler(cmpmode: bool):
         if cmpmode:
-            return 15
+            return 5
         else:
             return 600
 
@@ -130,7 +130,7 @@ def main():
 
                 elif event.key == pygame.K_d:  # Toggle between ascending and descending
                     sort_ascending = not sort_ascending
-                    if sorting_bubble or sorting_insertion:
+                    if sorting_bubble or sorting_insertion or sorting_selection or sorting_merge:
                         rects = rect.randomize(rects)
                         if sorting_bubble:
                             sort_generator = bubble_sort(
