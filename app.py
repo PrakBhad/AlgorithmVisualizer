@@ -18,8 +18,7 @@ class Rect(pygame.sprite.Sprite):
         # Update the position of this object by setting the values of rect.x and rect.y
         self.rect = self.image.get_rect(midbottom=(x, y))
 
-    @staticmethod
-    def randomize(rects: pygame.sprite.Group):
+    def randomize(self,rects: pygame.sprite.Group):
         screen_width, screen_height = pygame.display.get_window_size()
         rect_width = 10  # Fixed width for rectangles
         spacing = 5  # Space between rectangles
@@ -40,9 +39,6 @@ class Rect(pygame.sprite.Sprite):
         print(count)
         return rects
 
-
-class Graph:
-    print()
 
 def fps_toggler(cmpmode: bool):
     if cmpmode:
@@ -152,7 +148,7 @@ def main():
                     graphing_mode = not graphing_mode
                     if not graphing_mode:
                         rects = rect.randomize(rects)
-                    
+
                 elif event.key == pygame.K_c:
                     if not (sorting_bubble or sorting_insertion or sorting_selection or sorting_merge):
                         cmpmode = not cmpmode
