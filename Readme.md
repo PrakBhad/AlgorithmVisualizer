@@ -44,7 +44,7 @@ python app.py
 
 ### FPS Adjustment:
 
-To change the FPS values in each mode, change the return values in `function_toggler`.
+To change the FPS values in each mode, change the return values in `fps_toggler`.
 Current Values:
 Compare mode: 15
 Sorting mode: 600
