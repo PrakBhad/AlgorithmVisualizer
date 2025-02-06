@@ -42,6 +42,7 @@ Do not resize Window During sorting or graph visualization, as that will stop it
 *   **m:** Merge sort
 *   **d:** Toggle between ascending and descending order (Default is ascending, which is set to True)
 *   **c:** Comparison mode (Special mode, where FPS is lowered, elements are highlighted red)
+*   **f** Full Screen Mode for immersion
 
 ### FPS Adjustment:
 

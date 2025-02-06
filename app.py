@@ -68,6 +68,7 @@ def main():
     graphing_mode = False
 
     cmpmode = False
+    fullscreen = False
     fps = fps_toggler(cmpmode)
 
     paused = False
@@ -86,7 +87,7 @@ def main():
                 sorting_selection = False
                 sorting_merge = False
                 paused = False
-                
+            
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and not graphing_mode:  # Press 'r' to randomize
                     rects = rect.randomize(rects)
@@ -166,6 +167,16 @@ def main():
 
                 elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
                     paused = not paused
+                
+                elif event.key == pygame.K_f:
+                    fullscreen = not fullscreen
+                    if fullscreen:
+                        screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF | FULLSCREEN)
+                        rects = rect.randomize(rects)
+                    else:
+                        screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF | RESIZABLE)
+                        rects = rect.randomize(rects)
+                    
 
         # Sorting logic (runs continuously when sorting is True and not paused)
         if not paused:
