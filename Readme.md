@@ -31,6 +31,7 @@ python app.py
 ```
 
 ## Additional Info
+Do not resize Window During sorting or graph visualization, as that will stop it!
 
 ### Keybinds:
 
@@ -40,7 +41,7 @@ python app.py
 *   **s:** Selection sort
 *   **m:** Merge sort
 *   **d:** Toggle between ascending and descending order (Default is ascending, which is set to True)
-*   **c:** Comparison mode (Special mode, where FPS is lowered and is considerably more slowed down, and the elements currently being evaluated by the sorting algorithm are highlighted in red in real-time. Default is False).
+*   **c:** Comparison mode (Special mode, where FPS is lowered, elements are highlighted red)
 
 ### FPS Adjustment:
 
