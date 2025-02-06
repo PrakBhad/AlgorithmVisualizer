@@ -18,15 +18,15 @@ class Rect(pygame.sprite.Sprite):
         # Update the position of this object by setting the values of rect.x and rect.y
         self.rect = self.image.get_rect(midbottom=(x, y))
 
-    def randomize(self,rects: pygame.sprite.Group):
+    def randomize(self, rects: pygame.sprite.Group):
         screen_width, screen_height = pygame.display.get_window_size()
         rect_width = 10  # Fixed width for rectangles
         spacing = 5  # Space between rectangles
         height = 0
-        x = 20
+        x = 15
         rects.empty()
         count = 0
-        arr = [random.randint(120, 500) for i in range(100)]
+        arr = [random.randint(120, 500) for i in range(screen_width)]
         for i in range(len(arr)):
             if x + rect_width > screen_width:  # Width Check
                 break
@@ -49,7 +49,7 @@ def fps_toggler(cmpmode: bool):
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF)
+    screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF | RESIZABLE)
     pygame.display.set_caption("Algorithm Visualizer")
     clock = pygame.time.Clock()
     running = True
@@ -77,6 +77,16 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                
+            elif event.type == VIDEORESIZE:
+                rects = rect.randomize(rects)
+                sort_generator = None
+                sorting_bubble = False
+                sorting_insertion = False
+                sorting_selection = False
+                sorting_merge = False
+                paused = False
+                
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and not graphing_mode:  # Press 'r' to randomize
                     rects = rect.randomize(rects)
@@ -172,7 +182,9 @@ def main():
         else:
             rects.empty()
             screen.fill("black")
-
+            rects.draw(screen)
+        
+        pygame.display.update()
         pygame.display.flip()  # Flip the display to put your work on screen
         clock.tick(fps)
 
