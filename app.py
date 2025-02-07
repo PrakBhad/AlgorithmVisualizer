@@ -78,7 +78,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                
+
             elif event.type == VIDEORESIZE:
                 rects = rect.randomize(rects)
                 sort_generator = None
@@ -87,7 +87,7 @@ def main():
                 sorting_selection = False
                 sorting_merge = False
                 paused = False
-            
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and not graphing_mode:  # Press 'r' to randomize
                     rects = rect.randomize(rects)
@@ -167,16 +167,17 @@ def main():
 
                 elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
                     paused = not paused
-                
+
                 elif event.key == pygame.K_f:
                     fullscreen = not fullscreen
                     if fullscreen:
-                        screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF | FULLSCREEN)
+                        screen = pygame.display.set_mode(
+                            (1520, 860), flags=DOUBLEBUF | FULLSCREEN)
                         rects = rect.randomize(rects)
                     else:
-                        screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF | RESIZABLE)
+                        screen = pygame.display.set_mode(
+                            (1520, 860), flags=DOUBLEBUF | RESIZABLE)
                         rects = rect.randomize(rects)
-                    
 
         # Sorting logic (runs continuously when sorting is True and not paused)
         if not paused:
@@ -194,7 +195,7 @@ def main():
             rects.empty()
             screen.fill("black")
             rects.draw(screen)
-        
+
         pygame.display.update()
         pygame.display.flip()  # Flip the display to put your work on screen
         clock.tick(fps)
