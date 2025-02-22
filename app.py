@@ -73,7 +73,8 @@ class Maze:
                     yield maze  # Yield intermediate states for visualization
 
         yield maze  # Final maze state
-
+        
+    @staticmethod
     def draw_maze(screen, maze, cell_size):
         """Draws the maze only in the bottom half of the screen."""
         screen_width, screen_height = pygame.display.get_window_size()
