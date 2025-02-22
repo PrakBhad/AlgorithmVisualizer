@@ -38,7 +38,9 @@ class Rect(pygame.sprite.Sprite):
         print(len(rects))
         return rects
 
-    def generate_maze(self, width, height, cell_size=10):
+class Maze:
+    @staticmethod
+    def generate_maze(width, height, cell_size=10):
         """Generates a maze that occupies the bottom half of the screen."""
         half_height = height // 2
         cols, rows = width // cell_size, half_height // cell_size
@@ -72,7 +74,7 @@ class Rect(pygame.sprite.Sprite):
 
         yield maze  # Final maze state
 
-    def draw_maze(self, screen, maze, cell_size):
+    def draw_maze(screen, maze, cell_size):
         """Draws the maze only in the bottom half of the screen."""
         screen_width, screen_height = pygame.display.get_window_size()
         offset_y = screen_height // 2  # Start drawing from the middle
@@ -137,7 +139,7 @@ def main():
 
             elif event.type == VIDEORESIZE and graphing_mode:
                 screen_width, screen_height = pygame.display.get_window_size()
-                maze_generator = rect.generate_maze(
+                maze_generator = Maze.generate_maze(
                     screen_width, screen_height)
                 maze = [[1 for _ in range(screen_width)]
                         for _ in range(screen_height)]
@@ -160,7 +162,7 @@ def main():
                     maze_generator = None
 
                 elif event.key == pygame.K_r and graphing_mode:  # Press 'r' to randomize
-                    maze_generator = rect.generate_maze(
+                    maze_generator = Maze.generate_maze(
                         screen_width, screen_height)
                     maze = [[1 for _ in range(screen_width)]
                             for _ in range(screen_height)]
@@ -239,7 +241,7 @@ def main():
                         rects = rect.randomize(rects)
                     else:
                         screen_width, screen_height = pygame.display.get_window_size()
-                        maze_generator = rect.generate_maze(
+                        maze_generator = Maze.generate_maze(
                             screen_width, screen_height)
                         maze = [[1 for _ in range(screen_width)]
                                 for _ in range(screen_height)]
@@ -268,14 +270,14 @@ def main():
                     if fullscreen:
                         screen = pygame.display.set_mode(
                             (1520, 860), flags=DOUBLEBUF | FULLSCREEN)
-                        maze_generator = rect.generate_maze(
+                        maze_generator = Maze.generate_maze(
                             screen_width, screen_height)
                         maze = [[1 for _ in range(screen_width)]
                                 for _ in range(screen_height)]
                     else:
                         screen = pygame.display.set_mode(
                             (1520, 860), flags=DOUBLEBUF | RESIZABLE)
-                        maze_generator = rect.generate_maze(
+                        maze_generator = Maze.generate_maze(
                             screen_width, screen_height)
                         maze = [[1 for _ in range(screen_width)] for _ in range(screen_height)]
         # Sorting logic (runs continuously when sorting is True and not paused)
@@ -299,7 +301,7 @@ def main():
             rects.draw(screen)  # Draw rectangles onto screen
         else:
             screen.fill("black")
-            rect.draw_maze(screen,maze,10)
+            Maze.draw_maze(screen,maze,10)
         
         pygame.display.flip()  # Flip the display to put your work on screen
         clock.tick(fps)
