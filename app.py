@@ -2,6 +2,10 @@ from Sorting_Algorithms.bubblesort import *
 from Sorting_Algorithms.insertionsort import *
 from Sorting_Algorithms.selectionsort import *
 from Sorting_Algorithms.mergesort import *
+from Graphing_Algorithms.bfs import *
+from Graphing_Algorithms.dfs import *
+from Graphing_Algorithms.dijkstra import *
+
 import pygame
 from pygame.locals import *
 import random
