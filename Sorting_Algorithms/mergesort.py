@@ -1,5 +1,6 @@
 import pygame
 
+
 def merge_sort(rects: pygame.sprite.Group, ascending: bool = True):
     sprite_list = rects.sprites()
     n = len(sprite_list)
@@ -18,26 +19,20 @@ def merge_sort(rects: pygame.sprite.Group, ascending: bool = True):
             k = l
 
             while i < len(L) and j < len(R):
-                # Highlight comparison
-                
+                # Highlight comparison without flashing
                 L[i].image.fill((255, 0, 0))
-                R[j].image.fill((255, 0, 0))
+                R[j].image.fill((255, 0, 0))  
                 yield
 
                 # Compare values
                 if (L[i].image.get_height() <= R[j].image.get_height()) if ascending else \
                    (L[i].image.get_height() >= R[j].image.get_height()):
                     sprite_list[k] = L[i]
-                    # Reset colors before moving index
-                    
-                    L[i].image.fill((0, 255, 0))
-                    R[j].image.fill((0, 255, 0))
+                    L[i].image.fill((0, 255, 0))  # Green for sorted element
                     i += 1
                 else:
                     sprite_list[k] = R[j]
-                    # Reset colors before moving index
-                    L[i].image.fill((0, 255, 0))
-                    R[j].image.fill((0, 255, 0))
+                    R[j].image.fill((0, 255, 0))  # Green for sorted element
                     j += 1
                 k += 1
                 yield
@@ -45,22 +40,22 @@ def merge_sort(rects: pygame.sprite.Group, ascending: bool = True):
             # Handle remaining elements
             while i < len(L):
                 sprite_list[k] = L[i]
-                
-                L[i].image.fill((0, 255, 0))
+                L[i].image.fill((0, 255, 0))  # Green for sorted element
                 i += 1
                 k += 1
                 yield
 
             while j < len(R):
                 sprite_list[k] = R[j]
-                R[j].image.fill((0, 255, 0))
+                R[j].image.fill((0, 255, 0))  # Green for sorted element
                 j += 1
                 k += 1
                 yield
 
-            # Update positions
+            # Update positions after merging
             for idx, sprite in enumerate(sprite_list):
-                sprite.rect.x = left_padding + idx * (sprite.rect.width + spacing)
+                sprite.rect.x = left_padding + idx * \
+                    (sprite.rect.width + spacing)
             yield
 
         width *= 2
