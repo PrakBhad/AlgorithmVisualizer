@@ -1,3 +1,4 @@
+import pygame_menu.locals
 from Sorting_Algorithms.bubblesort import *
 from Sorting_Algorithms.insertionsort import *
 from Sorting_Algorithms.selectionsort import *
@@ -5,166 +6,184 @@ from Sorting_Algorithms.mergesort import *
 from Sorting_Algorithms.rects import Rect as CustomRect
 
 import pygame
+import pygame_menu
 from pygame.locals import *
 
-def fps_toggler(cmpmode: bool):
-    if cmpmode:
-        return 15
-    else:
-        return 600
+pygame.init()
+width = 1520
+height = 860
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption('Main Menu')
+clock = pygame.time.Clock()
+
+# Define a custom black theme
+black_theme = pygame_menu.themes.Theme(
+    background_color=(0, 0, 0),   # Black background
+    title_background_color=(0, 0, 0),  # Black title background
+    title_font_color=(255, 255, 255),  # White title font
+    widget_font_color=(255, 255, 255),  # White widget font
+    widget_background_color=(0, 0, 0),  # Black widget background
+    selection_color=(255, 255, 255),   # White selection color
+    scrollbar_color=(255, 255, 255),    # White scrollbar
+)
+
+main_menu = None
 
 
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((1520, 860), flags=DOUBLEBUF | RESIZABLE)
-    pygame.display.set_caption("Algorithm Visualizer")
-    clock = pygame.time.Clock()
-    running = True
+def initialize_main_menu():
+    """Initialize the main main_menu."""
+    global main_menu
+    main_menu = pygame_menu.Menu(width=width, height=height,
+                                 title='', theme=black_theme)
+    main_menu.add.button('Sorting Mode', Sorting_mode)
+    main_menu.add.button('Graphing Mode', Graphing_mode)
+    pygame.display.set_caption('Main Menu')
 
+
+def return_to_main_menu():
+    """Return to the main main_menu."""
+    initialize_main_menu()
+    main_menu.mainloop(screen)
+
+
+sorting_generator = None
+is_sorting = False  # Track if sorting is in progress
+is_paused = False   # Track if sorting is paused
+
+
+def choose_sorting_algorithm(value, rects, order_state):
+    global sorting_generator
+    print(f"Selected Algorithm: {value}")  # Debugging output
+    if value == 1:
+        print("Initializing Bubble Sort...")
+        sorting_generator = bubble_sort(
+            rects, ascending=order_state["is_ascending"])
+    elif value == 2:
+        print("Initializing Insertion Sort...")
+        sorting_generator = insertion_sort(
+            rects, ascending=order_state["is_ascending"])
+    elif value == 3:
+        print("Initializing Selection Sort...")
+        sorting_generator = selection_sort(
+            rects, ascending=order_state["is_ascending"])
+    elif value == 4:
+        print("Initializing Merge Sort...")
+        sorting_generator = merge_sort(
+            rects, ascending=order_state["is_ascending"])
+
+
+def toggle_order(button, order_state):
+    """Toggle between ascending and descending order."""
+    order_state["is_ascending"] = not order_state["is_ascending"]  # Update the mutable state
+    button.set_title(
+        f'Toggle Order: {"Ascending" if order_state["is_ascending"] else "Descending"}')
+
+
+def start_sorting():
+    """Start the sorting process."""
+    global is_sorting
+    is_sorting = True
+
+
+def toggle_pause(button):
+    """Toggle between pause and resume."""
+    global is_paused
+    is_paused = not is_paused
+    button.set_title("Resume" if is_paused else "Pause")
+
+
+def Sorting_mode():
+    global sorting_generator, is_sorting, is_paused
+    sorting_generator = None
+    is_sorting = False
+    is_paused = False
+    pygame.display.set_caption('Sorting Visualizer')
+
+    sorting_menu = pygame_menu.Menu(width=width, height=height, title='',
+                                    theme=black_theme, center_content=False)
+
+    # Create and randomize rectangles for sorting visualization
     rect = CustomRect()
     rects = pygame.sprite.Group()
     rects = rect.randomize(rects)
 
-    sort_generator = None
-    sorting_bubble = False
-    sorting_insertion = False
-    sorting_selection = False
-    sorting_merge = False
-    sort_ascending = True  # True for ascending, False for descending
+    # Add and position the 'Back' button
+    back = sorting_menu.add.button('Back', return_to_main_menu)
+    back.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
 
-    graphing_mode = False
+    # Add and position the sorting algorithm dropdown
+    order_state = {"is_ascending": True}  # Use a dictionary to track the state
+    sorting_algorithms = sorting_menu.add.dropselect(
+        'Sorting Algorithm: ',
+        items=[
+            ('Bubble Sort', 1),
+            ('Insertion Sort', 2),
+            ('Selection Sort', 3),
+            ('Merge Sort', 4)
+        ],
+        onchange=lambda value, _: choose_sorting_algorithm(
+            value[0][1], rects, order_state),  # Extract identifier
+        open_middle=False
+    )
+    sorting_algorithms.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
-    cmpmode = False
-    fullscreen = False
-    fps = fps_toggler(cmpmode)
+    # Add and position the 'Randomize' button
+    randomize = sorting_menu.add.button(
+        'Randomize', lambda: rect.randomize(rects))
+    randomize.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
-    paused = False
+    # Add a toggle button for ascending/descending order
+    toggle_order_button = sorting_menu.add.button(
+        'Toggle Order: Ascending', lambda: toggle_order(toggle_order_button, order_state))
+    toggle_order_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
-    while running:
-        # Poll for events
-        for event in pygame.event.get():
+    # Add a 'Start' button
+    start_button = sorting_menu.add.button('Start', start_sorting)
+    start_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
+
+    # Add a 'Pause' button
+    pause_button = sorting_menu.add.button(
+        'Pause', lambda: toggle_pause(pause_button))
+    pause_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
+
+    fps = 10
+    while True:
+        events = pygame.event.get()  # Retrieve all events from Pygame's event queue
+
+        for event in events:
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                exit()
 
-            elif event.type == VIDEORESIZE and not graphing_mode:
-                rects = rect.randomize(rects)
-                sort_generator = None
-                sorting_bubble = False
-                sorting_insertion = False
-                sorting_selection = False
-                sorting_merge = False
-                paused = False
-                
-            
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r and not graphing_mode:  # Press 'r' to randomize
-                    rects = rect.randomize(rects)
-                    sort_generator = None
-                    sorting_bubble = False
-                    sorting_insertion = False
-                    sorting_selection = False
-                    sorting_merge = False
-                    paused = False
-                    
-                elif event.key == pygame.K_b and not graphing_mode:  # Toggle bubble sort
-                    sorting_insertion = False
-                    sorting_selection = False
-                    sorting_merge = False
-                    sorting_bubble = not sorting_bubble
-                    if sorting_bubble:
-                        rects = rect.randomize(rects)
-                        sort_generator = bubble_sort(
-                            rects, sort_ascending, cmpmode)
+        # Fill the screen with black
+        screen.fill("black")
+        sorting_menu.update(events)
+        sorting_menu.draw(screen)
+        rects.draw(screen)
 
-                elif event.key == pygame.K_i and not graphing_mode:  # Toggle insertion sort
-                    sorting_bubble = False
-                    sorting_selection = False
-                    sorting_merge = False
-                    sorting_insertion = not sorting_insertion
-                    if sorting_insertion:
-                        rects = rect.randomize(rects)
-                        sort_generator = insertion_sort(
-                            rects, sort_ascending, cmpmode)
+        # If sorting is in progress and not paused, step through the generator
+        if is_sorting and not is_paused and sorting_generator is not None:
+            try:
+                next(sorting_generator)  # Advance the sorting algorithm
+            except StopIteration:
+                sorting_generator = None  # Sorting is complete
+                is_sorting = False  # Reset sorting state
 
-                elif event.key == pygame.K_s and not graphing_mode:  # Toggle selection sort
-                    sorting_bubble = False
-                    sorting_insertion = False
-                    sorting_merge = False
-                    sorting_selection = not sorting_selection
-                    if sorting_selection:
-                        rects = rect.randomize(rects)
-                        sort_generator = selection_sort(
-                            rects, sort_ascending, cmpmode)
-
-                elif event.key == pygame.K_m and not graphing_mode:  # Toggle merge sort
-                    sorting_bubble = False
-                    sorting_insertion = False
-                    sorting_selection = False
-                    sorting_merge = not sorting_merge
-                    if sorting_merge:
-                        rects = rect.randomize(rects)
-                        sort_generator = merge_sort(
-                            rects, sort_ascending, cmpmode)
-
-                elif event.key == pygame.K_d and not graphing_mode:  # Toggle between ascending and descending
-                    sort_ascending = not sort_ascending
-                    if sorting_bubble or sorting_insertion or sorting_selection or sorting_merge:
-                        rects = rect.randomize(rects)
-                        if sorting_bubble:
-                            sort_generator = bubble_sort(
-                                rects, sort_ascending, cmpmode)
-                        elif sorting_insertion:
-                            sort_generator = insertion_sort(
-                                rects, sort_ascending, cmpmode)
-                        elif sorting_selection:
-                            sort_generator = selection_sort(
-                                rects, sort_ascending, cmpmode)
-                        elif sorting_merge:
-                            sort_generator = merge_sort(
-                                rects, sort_ascending, cmpmode)
-
-                elif event.key == pygame.K_g:
-                    graphing_mode = not graphing_mode
-                    if not graphing_mode:
-                        rects = rect.randomize(rects)
-
-                elif event.key == pygame.K_c and not graphing_mode:
-                    if not (sorting_bubble or sorting_insertion or sorting_selection or sorting_merge):
-                        cmpmode = not cmpmode
-                        fps = fps_toggler(cmpmode)
-
-                elif event.key == pygame.K_SPACE:  # Press SPACE to pause/unpause
-                    paused = not paused
-
-                elif event.key == pygame.K_f and not graphing_mode:
-                    fullscreen = not fullscreen
-                    if fullscreen:
-                        screen = pygame.display.set_mode(
-                            (1520, 860), flags=DOUBLEBUF | FULLSCREEN)
-                        rects = rect.randomize(rects)
-                    else:
-                        screen = pygame.display.set_mode(
-                            (1520, 860), flags=DOUBLEBUF | RESIZABLE)
-                        rects = rect.randomize(rects)
-
-        # Sorting logic (runs continuously when sorting is True and not paused)
-        if not paused:
-            if (sorting_bubble or sorting_insertion or sorting_selection or sorting_merge) and sort_generator is not None and not graphing_mode:
-                try:
-                    next(sort_generator)
-                except StopIteration:
-                    sorting_bubble = sorting_insertion = sorting_merge = sorting_selection = False
-                    sort_generator = None
-
-        if not graphing_mode:
-            screen.fill("black")
-            rects.draw(screen)  # Draw rectangles onto screen
-
-        pygame.display.flip()  # Flip the display to put your work on screen
+        # Update the display and control FPS
+        pygame.display.flip()
         clock.tick(fps)
 
-    pygame.quit()
+
+def Graphing_mode():
+    pygame.display.set_caption('Graphing Visualizer')
+    main_menu.clear()
+
+    back = main_menu.add.button('Back', return_to_main_menu)
+    back.set_position(50, 50)
+    screen.fill("black")
+
+    pygame.display.flip()
 
 
-if __name__ == "__main__":
-    main()
+initialize_main_menu()
+main_menu.mainloop(screen)

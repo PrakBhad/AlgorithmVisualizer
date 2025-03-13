@@ -1,6 +1,6 @@
 import pygame
 
-def merge_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool = False):
+def merge_sort(rects: pygame.sprite.Group, ascending: bool = True):
     sprite_list = rects.sprites()
     n = len(sprite_list)
     width = 1
@@ -19,26 +19,25 @@ def merge_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool
 
             while i < len(L) and j < len(R):
                 # Highlight comparison
-                if cmpmode:
-                    L[i].image.fill((255, 0, 0))
-                    R[j].image.fill((255, 0, 0))
-                    yield
+                
+                L[i].image.fill((255, 0, 0))
+                R[j].image.fill((255, 0, 0))
+                yield
 
                 # Compare values
                 if (L[i].image.get_height() <= R[j].image.get_height()) if ascending else \
                    (L[i].image.get_height() >= R[j].image.get_height()):
                     sprite_list[k] = L[i]
                     # Reset colors before moving index
-                    if cmpmode:
-                        L[i].image.fill((0, 255, 0))
-                        R[j].image.fill((0, 255, 0))
+                    
+                    L[i].image.fill((0, 255, 0))
+                    R[j].image.fill((0, 255, 0))
                     i += 1
                 else:
                     sprite_list[k] = R[j]
                     # Reset colors before moving index
-                    if cmpmode:
-                        L[i].image.fill((0, 255, 0))
-                        R[j].image.fill((0, 255, 0))
+                    L[i].image.fill((0, 255, 0))
+                    R[j].image.fill((0, 255, 0))
                     j += 1
                 k += 1
                 yield
@@ -46,16 +45,15 @@ def merge_sort(rects: pygame.sprite.Group, ascending: bool = True, cmpmode: bool
             # Handle remaining elements
             while i < len(L):
                 sprite_list[k] = L[i]
-                if cmpmode:
-                    L[i].image.fill((0, 255, 0))
+                
+                L[i].image.fill((0, 255, 0))
                 i += 1
                 k += 1
                 yield
 
             while j < len(R):
                 sprite_list[k] = R[j]
-                if cmpmode:
-                    R[j].image.fill((0, 255, 0))
+                R[j].image.fill((0, 255, 0))
                 j += 1
                 k += 1
                 yield
