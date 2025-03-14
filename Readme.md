@@ -30,26 +30,6 @@ To start app run
 python app.py
 ```
 
-## Additional Info
-Do not resize Window During sorting or graph visualization, as that will stop it!
-
-### Keybinds:
-
-*   **r:** Randomize the array
-*   **b:** Bubble sort
-*   **i:** Insertion sort
-*   **s:** Selection sort
-*   **m:** Merge sort
-*   **d:** Toggle between ascending and descending order (Default is ascending, which is set to True)
-*   **c:** Comparison mode (Special mode, where FPS is lowered, elements are highlighted red)
-*   **f** Full Screen Mode for immersion
-
-### FPS Adjustment:
-
-To change the FPS values in each mode, change the return values in `fps_toggler`.
-Current Values:
-Compare mode: 15
-Sorting mode: 600
 
 ## **Licence**
 [MIT Licence](LICENSE)
