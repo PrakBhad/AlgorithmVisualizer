@@ -1,4 +1,3 @@
-import pygame_menu.locals
 from Sorting_Algorithms.bubblesort import *
 from Sorting_Algorithms.insertionsort import *
 from Sorting_Algorithms.selectionsort import *
@@ -129,7 +128,7 @@ def Sorting_mode():
 
     # Add and position the 'Randomize' button
     randomize = sorting_menu.add.button(
-        'Randomize', lambda: rect.randomize(rects))
+        'Randomize', lambda: rect.randomize(rects) if not is_sorting else None)
     randomize.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
     # Add a toggle button for ascending/descending order
@@ -146,7 +145,8 @@ def Sorting_mode():
         'Pause', lambda: toggle_pause(pause_button))
     pause_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
-    fps = 10
+    fps = 60
+    sorting_fps = 60
     while True:
         events = pygame.event.get()  # Retrieve all events from Pygame's event queue
 
@@ -163,11 +163,15 @@ def Sorting_mode():
 
         # If sorting is in progress and not paused, step through the generator
         if is_sorting and not is_paused and sorting_generator is not None:
+            randomize.enabled = False  # Disable the 'Randomize' button
             try:
                 next(sorting_generator)  # Advance the sorting algorithm
+                fps = sorting_fps  # Set the FPS to the sorting FPS
             except StopIteration:
                 sorting_generator = None  # Sorting is complete
+                randomize.enabled = True  # Enable the 'Randomize' button
                 is_sorting = False  # Reset sorting state
+                fps = 60  # Reset FPS
 
         # Update the display and control FPS
         pygame.display.flip()
