@@ -146,7 +146,7 @@ def Sorting_mode():
     pause_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
     fps = 60
-    sorting_fps = 60
+    sorting_fps = 10
     while True:
         events = pygame.event.get()  # Retrieve all events from Pygame's event queue
 
