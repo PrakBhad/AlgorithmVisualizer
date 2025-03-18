@@ -3,6 +3,7 @@ from Sorting_Algorithms.insertionsort import *
 from Sorting_Algorithms.selectionsort import *
 from Sorting_Algorithms.mergesort import *
 from Sorting_Algorithms.rects import Rect as CustomRect
+from Graphing_Algorithms.placer import *
 
 import pygame
 import pygame_menu
@@ -178,15 +179,75 @@ def Sorting_mode():
         clock.tick(fps)
 
 
+def choose_component(component, current_component):
+    if component == 1:
+        current_component[0] = "Node"
+    elif component == 2:
+        current_component[0] = "Line"
+
+
 def Graphing_mode():
     pygame.display.set_caption('Graphing Visualizer')
-    main_menu.clear()
+    graphing_menu = pygame_menu.Menu(width=width, height=height, title='',
+                                     theme=black_theme, center_content=False)
 
-    back = main_menu.add.button('Back', return_to_main_menu)
-    back.set_position(50, 50)
-    screen.fill("black")
+    back = graphing_menu.add.button('Back', return_to_main_menu)
+    back.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
 
-    pygame.display.flip()
+    current_component = ["Node"]
+    adder = graphing_menu.add.dropselect(
+        'Component', items=[('Node', 1), ('Line', 2)],
+        onchange=lambda component, _: choose_component(
+            component[0][1], current_component),
+        open_middle=False)  # Adding Component Selector
+
+    adder.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
+
+    fps = 60
+    graphing_fps = 10
+
+    circles = []
+    lines = []
+    last_position = None
+
+    while True:
+        events = pygame.event.get()  # Retrieve all events from Pygame's event queue
+
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left click
+                    # Add mouse position to circles list
+                    mouse_pos = pygame.mouse.get_pos()
+                    if current_component[0] == "Node":
+                        circles.append(mouse_pos)
+
+                    elif current_component[0] == "Line":
+                        if last_position:
+                            lines.append((last_position, mouse_pos))
+                        last_position = mouse_pos
+
+        # Fill the screen with black
+        screen.fill("black")
+
+        # Update and draw the menu
+        graphing_menu.update(events)
+        graphing_menu.draw(screen)
+
+        # Draw all circles
+        for pos in circles:
+            pygame.draw.circle(screen, (255, 255, 255), pos,
+                               10)  # Draw white circles
+
+        for start_pos, end_pos in lines:
+            pygame.draw.line(screen, (255, 255, 255), start_pos,
+                             end_pos, 2)  # Draw white lines
+
+        # Refresh the screen and tick the clock
+        pygame.display.flip()
+        clock.tick(fps)
 
 
 initialize_main_menu()
