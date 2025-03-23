@@ -7,6 +7,7 @@ from Graphing_Algorithms.placer import *
 
 import pygame
 import pygame_menu
+import math
 from pygame.locals import *
 
 pygame.init()
@@ -26,6 +27,47 @@ black_theme = pygame_menu.themes.Theme(
     selection_color=(255, 255, 255),   # White selection color
     scrollbar_color=(255, 255, 255),    # White scrollbar
 )
+
+
+def choose_sorting_algorithm(value, rects, order_state):
+    global sorting_generator
+    print(f"Selected Algorithm: {value}")  # Debugging output
+    if value == 1:
+        print("Initializing Bubble Sort...")
+        sorting_generator = bubble_sort(
+            rects, ascending=order_state["is_ascending"])
+    elif value == 2:
+        print("Initializing Insertion Sort...")
+        sorting_generator = insertion_sort(
+            rects, ascending=order_state["is_ascending"])
+    elif value == 3:
+        print("Initializing Selection Sort...")
+        sorting_generator = selection_sort(
+            rects, ascending=order_state["is_ascending"])
+    elif value == 4:
+        print("Initializing Merge Sort...")
+        sorting_generator = merge_sort(
+            rects, ascending=order_state["is_ascending"])
+
+
+def toggle_order(button, order_state):
+    """Toggle between ascending and descending order."""
+    order_state["is_ascending"] = not order_state["is_ascending"]  # Update the mutable state
+    button.set_title(
+        f'Toggle Order: {"Ascending" if order_state["is_ascending"] else "Descending"}')
+
+
+def start_sorting():
+    """Start the sorting process."""
+    global is_sorting
+    is_sorting = True
+
+
+def toggle_pause(button):
+    """Toggle between pause and resume."""
+    global is_paused
+    is_paused = not is_paused
+    button.set_title("Resume" if is_paused else "Pause")
 
 main_menu = None
 
@@ -179,13 +221,6 @@ def Sorting_mode():
         clock.tick(fps)
 
 
-def choose_component(component, current_component):
-    if component == 1:
-        current_component[0] = "Node"
-    elif component == 2:
-        current_component[0] = "Line"
-
-
 def Graphing_mode():
     pygame.display.set_caption('Graphing Visualizer')
     graphing_menu = pygame_menu.Menu(width=width, height=height, title='',
@@ -200,15 +235,17 @@ def Graphing_mode():
         onchange=lambda component, _: choose_component(
             component[0][1], current_component),
         open_middle=False)  # Adding Component Selector
-
     adder.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
-
-    fps = 60
-    graphing_fps = 10
 
     circles = []
     lines = []
-    last_position = None
+    start_hovered_circle = None
+    reset = graphing_menu.add.button(
+        'Reset', lambda: remove_components(circles, lines))
+    reset.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
+
+    fps = 60
+    graphing_fps = 10
 
     while True:
         events = pygame.event.get()  # Retrieve all events from Pygame's event queue
@@ -222,13 +259,34 @@ def Graphing_mode():
                     # Add mouse position to circles list
                     mouse_pos = pygame.mouse.get_pos()
                     if current_component[0] == "Node":
-                        circles.append(mouse_pos)
+                        if mouse_pos[1] >= 300:
+                            circles.append(mouse_pos)
 
                     elif current_component[0] == "Line":
-                        if last_position:
-                            lines.append((last_position, mouse_pos))
-                        last_position = mouse_pos
+                        if mouse_pos[1] >= 300:
+                            hovered_circle = near_circle(mouse_pos, circles)
+                            if hovered_circle:
+                                if start_hovered_circle:
+                                    lines.append(
+                                        (start_hovered_circle, hovered_circle))
+                                    start_hovered_circle = None  # Reset after drawing the line
+                                else:
+                                    # Set this circle as the start for the line
+                                    start_hovered_circle = hovered_circle
 
+                elif event.button == 3:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if mouse_pos[1] >= 300:
+                        # Check for node removal
+                        hovered_circle = near_circle(mouse_pos, circles)
+                        if hovered_circle:
+                            circles.remove(hovered_circle)
+
+                        # Check for line removal
+                        hovered_line = near_line(mouse_pos, lines)
+                        if hovered_line:
+                            lines.remove(hovered_line)
+                            
         # Fill the screen with black
         screen.fill("black")
 
