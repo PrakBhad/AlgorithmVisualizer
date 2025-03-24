@@ -69,6 +69,7 @@ def toggle_pause(button):
     is_paused = not is_paused
     button.set_title("Resume" if is_paused else "Pause")
 
+
 main_menu = None
 
 
@@ -267,8 +268,10 @@ def Graphing_mode():
                             hovered_circle = near_circle(mouse_pos, circles)
                             if hovered_circle:
                                 if start_hovered_circle:
+                                    length = math.ceil(math.hypot(start_hovered_circle[0] - hovered_circle[0],
+                                                        start_hovered_circle[1] - hovered_circle[1]))
                                     lines.append(
-                                        (start_hovered_circle, hovered_circle))
+                                        (start_hovered_circle, hovered_circle, length))
                                     start_hovered_circle = None  # Reset after drawing the line
                                 else:
                                     # Set this circle as the start for the line
@@ -286,7 +289,7 @@ def Graphing_mode():
                         hovered_line = near_line(mouse_pos, lines)
                         if hovered_line:
                             lines.remove(hovered_line)
-                            
+
         # Fill the screen with black
         screen.fill("black")
 
@@ -299,7 +302,7 @@ def Graphing_mode():
             pygame.draw.circle(screen, (255, 255, 255), pos,
                                10)  # Draw white circles
 
-        for start_pos, end_pos in lines:
+        for start_pos, end_pos, length in lines:
             pygame.draw.line(screen, (255, 255, 255), start_pos,
                              end_pos, 2)  # Draw white lines
 
