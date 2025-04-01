@@ -1,3 +1,5 @@
+import heapq
+from collections import deque
 from Sorting_Algorithms.bubblesort import *
 from Sorting_Algorithms.insertionsort import *
 from Sorting_Algorithms.selectionsort import *
@@ -9,6 +11,7 @@ import pygame
 import pygame_menu
 import math
 from pygame.locals import *
+import random
 
 pygame.init()
 width = 1520
@@ -65,9 +68,9 @@ def start_sorting():
 
 def toggle_pause(button):
     """Toggle between pause and resume."""
-    global is_paused
-    is_paused = not is_paused
-    button.set_title("Resume" if is_paused else "Pause")
+    global is_paused_sorting
+    is_paused_sorting = not is_paused_sorting
+    button.set_title("Resume" if is_paused_sorting else "Pause")
 
 
 main_menu = None
@@ -91,7 +94,7 @@ def return_to_main_menu():
 
 sorting_generator = None
 is_sorting = False  # Track if sorting is in progress
-is_paused = False   # Track if sorting is paused
+is_paused_sorting = False   # Track if sorting is paused
 
 
 def choose_sorting_algorithm(value, rects, order_state):
@@ -130,16 +133,16 @@ def start_sorting():
 
 def toggle_pause(button):
     """Toggle between pause and resume."""
-    global is_paused
-    is_paused = not is_paused
-    button.set_title("Resume" if is_paused else "Pause")
+    global is_paused_sorting
+    is_paused_sorting = not is_paused_sorting
+    button.set_title("Resume" if is_paused_sorting else "Pause")
 
 
 def Sorting_mode():
-    global sorting_generator, is_sorting, is_paused
+    global sorting_generator, is_sorting, is_paused_sorting
     sorting_generator = None
     is_sorting = False
-    is_paused = False
+    is_paused_sorting = False
     pygame.display.set_caption('Sorting Visualizer')
 
     sorting_menu = pygame_menu.Menu(width=width, height=height, title='',
@@ -206,7 +209,7 @@ def Sorting_mode():
         rects.draw(screen)
 
         # If sorting is in progress and not paused, step through the generator
-        if is_sorting and not is_paused and sorting_generator is not None:
+        if is_sorting and not is_paused_sorting and sorting_generator is not None:
             randomize.enabled = False  # Disable the 'Randomize' button
             try:
                 next(sorting_generator)  # Advance the sorting algorithm
@@ -222,7 +225,126 @@ def Sorting_mode():
         clock.tick(fps)
 
 
+graphing_generator = None
+is_paused_graphing = False
+is_graphing = False
+graph = {}  # Dictionary to store adjacency list
+selected_algorithm = None  # Store selected algorithm
+start_node = None
+goal_node = None
+
+
+def build_graph(lines):
+    global graph
+    graph = {}
+
+    for start, end, length in lines:
+        graph.setdefault(start, []).append((end, length))
+        graph.setdefault(end, []).append((start, length))  # Undirected graph
+
+
+def bfs(start_node):
+    visited = set()
+    queue = deque([start_node])
+    parent = {start_node: None}  # Store parent nodes for path reconstruction
+
+    while queue:
+        node = queue.popleft()
+        if node in visited:
+            continue
+        visited.add(node)
+
+        yield node, parent  # Return the node and the parent dictionary
+
+        for neighbor, _ in graph.get(node, []):
+            if neighbor not in visited:
+                queue.append(neighbor)
+                parent[neighbor] = node  # Track the path
+
+
+def dfs(start_node):
+    visited = set()
+    stack = [start_node]
+    parent = {start_node: None}  # Store parent nodes for path reconstruction
+
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+
+        yield node, parent  # Return the node and the parent dictionary
+
+        for neighbor, _ in graph.get(node, []):
+            if neighbor not in visited:
+                stack.append(neighbor)
+                parent[neighbor] = node  # Track the path
+
+
+def dijkstra(start_node):
+    distances = {node: float('inf') for node in graph}
+    distances[start_node] = 0
+    priority_queue = [(0, start_node)]
+    visited = set()
+    parent = {start_node: None}  # Store parent nodes for path reconstruction
+
+    while priority_queue:
+        current_distance, node = heapq.heappop(priority_queue)
+
+        if node in visited:
+            continue
+        visited.add(node)
+
+        yield node, parent  # Return the node and the parent dictionary
+
+        for neighbor, weight in graph.get(node, []):
+            new_distance = current_distance + weight
+            if new_distance < distances[neighbor]:
+                distances[neighbor] = new_distance
+                heapq.heappush(priority_queue, (new_distance, neighbor))
+                parent[neighbor] = node  # Track the path
+
+
+def choose_graphing_algorithm(value, circles, lines):
+    """Store selected algorithm but do not start until 'Start' is pressed."""
+    global selected_algorithm, graphing_generator
+    build_graph(lines)  # Build graph from lines
+    selected_algorithm = value  # Store selection for later
+
+
+def start_graphing():
+    global is_graphing, graphing_generator, start_node, goal_node
+    if not selected_algorithm:
+        print("No algorithm selected!")
+        return
+    if not graph:
+        print("Graph is empty! Add nodes and edges first.")
+        return
+    # Select random start and goal nodes
+    nodes = list(graph.keys())
+    if len(nodes) < 2:
+        print("Not enough nodes to select start and goal.")
+        return
+    start_node, goal_node = random.sample(
+        nodes, 2)  # Ensure they are different
+    is_graphing = True  # Enable graphing
+    if selected_algorithm == 1:
+        graphing_generator = bfs(start_node)
+    elif selected_algorithm == 2:
+        graphing_generator = dfs(start_node)
+    elif selected_algorithm == 3:
+        graphing_generator = dijkstra(start_node)
+
+
+def toggle_pause_graphing(button):
+    """Toggle between pause and resume."""
+    global is_paused_graphing
+    is_paused_graphing = not is_paused_graphing
+    button.set_title("Resume" if is_paused_graphing else "Pause")
+
+
 def Graphing_mode():
+    global is_graphing, graphing_generator, start_node, goal_node
     pygame.display.set_caption('Graphing Visualizer')
     graphing_menu = pygame_menu.Menu(width=width, height=height, title='',
                                      theme=black_theme, center_content=False)
@@ -245,9 +367,33 @@ def Graphing_mode():
         'Reset', lambda: remove_components(circles, lines))
     reset.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
 
-    fps = 60
-    graphing_fps = 10
+    graphing_algorithms = graphing_menu.add.dropselect(
+        'Sorting Algorithm: ',
+        items=[
+            ('BFS', 1),
+            ('DFS', 2),
+            ('Dijstra', 3)
+        ],
+        onchange=lambda value, _: choose_graphing_algorithm(
+            value[0][1], circles, lines),  # Extract identifier
+        open_middle=False
+    )
+    graphing_algorithms.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
+    start_button = graphing_menu.add.button('Start', start_graphing)
+    start_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
+
+    # Add a 'Pause' button
+    pause_button = graphing_menu.add.button(
+        'Pause', lambda: toggle_pause_graphing(pause_button))
+    pause_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
+
+    fps = 60
+    graphing_fps = 3
+    
+    explored_edges = set()
+    final_path_edges = set()
+    
     while True:
         events = pygame.event.get()  # Retrieve all events from Pygame's event queue
 
@@ -260,16 +406,16 @@ def Graphing_mode():
                     # Add mouse position to circles list
                     mouse_pos = pygame.mouse.get_pos()
                     if current_component[0] == "Node":
-                        if mouse_pos[1] >= 300:
+                        if mouse_pos[1] >= 420:
                             circles.append(mouse_pos)
 
                     elif current_component[0] == "Line":
-                        if mouse_pos[1] >= 300:
+                        if mouse_pos[1] >= 420:
                             hovered_circle = near_circle(mouse_pos, circles)
                             if hovered_circle:
                                 if start_hovered_circle:
                                     length = math.ceil(math.hypot(start_hovered_circle[0] - hovered_circle[0],
-                                                        start_hovered_circle[1] - hovered_circle[1]))
+                                                                  start_hovered_circle[1] - hovered_circle[1]))
                                     lines.append(
                                         (start_hovered_circle, hovered_circle, length))
                                     start_hovered_circle = None  # Reset after drawing the line
@@ -279,7 +425,7 @@ def Graphing_mode():
 
                 elif event.button == 3:
                     mouse_pos = pygame.mouse.get_pos()
-                    if mouse_pos[1] >= 300:
+                    if mouse_pos[1] >= 420:
                         # Check for node removal
                         hovered_circle = near_circle(mouse_pos, circles)
                         if hovered_circle:
@@ -298,13 +444,54 @@ def Graphing_mode():
         graphing_menu.draw(screen)
 
         # Draw all circles
-        for pos in circles:
-            pygame.draw.circle(screen, (255, 255, 255), pos,
-                               10)  # Draw white circles
-
         for start_pos, end_pos, length in lines:
-            pygame.draw.line(screen, (255, 255, 255), start_pos,
-                             end_pos, 2)  # Draw white lines
+            color = (255, 255, 255)  # Default white
+
+            if (start_pos, end_pos) in explored_edges or (end_pos, start_pos) in explored_edges:
+                color = (255, 255, 0)  # Yellow for explored edges
+
+            if (start_pos, end_pos) in final_path_edges or (end_pos, start_pos) in final_path_edges:
+                color = (255, 0, 0)  # Red for the final path
+
+            pygame.draw.line(screen, color, start_pos, end_pos, 2)
+
+        # Draw nodes (circles)
+        for pos in circles:
+            color = (255, 255, 255)  # Default white
+            if pos == start_node:
+                color = (0, 255, 0)  # Green for start
+            elif pos == goal_node:
+                color = (128, 0, 128)  # Purple for goal
+
+            pygame.draw.circle(screen, color, pos, 10)
+        
+        pygame.draw.line(screen, color=(255, 255, 255), start_pos=(
+            0, 380), end_pos=(1520, 380), width=10)
+
+        # Run graphing algorithm step-by-step
+        if is_graphing and graphing_generator:
+            try:
+                # Get node and parent dictionary
+                current_node, parent = next(graphing_generator)
+
+                # Add edges to explored_edges
+                if parent[current_node] is not None:
+                    explored_edges.add((parent[current_node], current_node))
+
+                # Highlight current node
+                pygame.draw.circle(screen, (0, 255, 0), current_node, 12)
+
+            except StopIteration:
+                # After algorithm finishes, reconstruct final path
+                node = goal_node
+                while node is not None and node in parent:
+                    prev_node = parent[node]
+                    if prev_node is not None:
+                        final_path_edges.add((prev_node, node))
+                    node = prev_node
+
+                is_graphing = False  # Stop graphing
+        
 
         # Refresh the screen and tick the clock
         pygame.display.flip()

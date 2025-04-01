@@ -29,7 +29,20 @@ To start app run
 ```bash
 python app.py
 ```
+## **Graphing Mode Controls**
+- **Left Click**: Place a node or a line  
+- **Right Click**: Remove a line or a node  
 
+## **Colour Coding**
+### **Sorting:**
+- 🟩 **Green**: Normal colour of the bar  
+- 🔴 **Red**: Elements that are being compared  
+
+### **Graphing:**
+- 🟣 **Purple**: Goal node  
+- 🟩 **Green**: Start node  
+- 🔴 **Red**: Final path from goal to start  
+- 🟡 **Yellow**: Explored area  
 
 ## **Licence**
 [MIT Licence](LICENSE)
