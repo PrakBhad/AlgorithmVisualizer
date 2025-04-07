@@ -389,7 +389,7 @@ def Graphing_mode():
     pause_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
     fps = 60
-    graphing_fps = 3
+    graphing_fps = 5
     
     explored_edges = set()
     final_path_edges = set()
@@ -470,6 +470,7 @@ def Graphing_mode():
 
         # Run graphing algorithm step-by-step
         if is_graphing and graphing_generator:
+            fps = graphing_fps
             try:
                 # Get node and parent dictionary
                 current_node, parent = next(graphing_generator)
@@ -491,6 +492,7 @@ def Graphing_mode():
                     node = prev_node
 
                 is_graphing = False  # Stop graphing
+                fps = 60
         
 
         # Refresh the screen and tick the clock

@@ -38,13 +38,31 @@ def point_to_line_distance(point, line_start, line_end):
     return math.hypot(point[0] - closest_point[0], point[1] - closest_point[1])
 
 
-def near_line(pos, lines):
+def near_line(mouse_pos, lines, threshold=5):
     for line in lines:
-        start, end = line  # unpack the line into two points (start and end)
-        distance = point_to_line_distance(pos, start, end)
-        if distance <= 15:  # Check if the point is near the line segment
+        start, end, _ = line
+        if point_near_line(mouse_pos, start, end, threshold):
             return line
     return None
+
+
+def point_near_line(p, a, b, threshold):
+    """Check if point p is within `threshold` pixels of line segment ab."""
+    ax, ay = a
+    bx, by = b
+    px, py = p
+
+    # Compute distance from p to line segment ab
+    line_len_sq = (bx - ax)**2 + (by - ay)**2
+    if line_len_sq == 0:
+        return math.hypot(px - ax, py - ay) < threshold
+
+    t = max(0, min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / line_len_sq))
+    proj_x = ax + t * (bx - ax)
+    proj_y = ay + t * (by - ay)
+
+    return math.hypot(px - proj_x, py - proj_y) < threshold
+
 
 
 def remove_components(circles: list, Lines: list):
