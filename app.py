@@ -53,13 +53,6 @@ def choose_sorting_algorithm(value, rects, order_state):
             rects, ascending=order_state["is_ascending"])
 
 
-def toggle_order(button, order_state):
-    """Toggle between ascending and descending order."""
-    order_state["is_ascending"] = not order_state["is_ascending"]  # Update the mutable state
-    button.set_title(
-        f'Toggle Order: {"Ascending" if order_state["is_ascending"] else "Descending"}')
-
-
 def start_sorting():
     """Start the sorting process."""
     global is_sorting
@@ -97,25 +90,37 @@ is_sorting = False  # Track if sorting is in progress
 is_paused_sorting = False   # Track if sorting is paused
 
 
+def toggle_order(button, order_state):
+    """Toggle between ascending and descending order."""
+    global is_sorting
+    # Only allow toggling if not currently sorting
+    if not is_sorting:
+        # Update the mutable state
+        order_state["is_ascending"] = not order_state["is_ascending"]
+        button.set_title(
+            f'Toggle Order: {"Ascending" if order_state["is_ascending"] else "Descending"}')
+
+
 def choose_sorting_algorithm(value, rects, order_state):
-    global sorting_generator
+    global sorting_generator, is_sorting
     print(f"Selected Algorithm: {value}")  # Debugging output
-    if value == 1:
-        print("Initializing Bubble Sort...")
-        sorting_generator = bubble_sort(
-            rects, ascending=order_state["is_ascending"])
-    elif value == 2:
-        print("Initializing Insertion Sort...")
-        sorting_generator = insertion_sort(
-            rects, ascending=order_state["is_ascending"])
-    elif value == 3:
-        print("Initializing Selection Sort...")
-        sorting_generator = selection_sort(
-            rects, ascending=order_state["is_ascending"])
-    elif value == 4:
-        print("Initializing Merge Sort...")
-        sorting_generator = merge_sort(
-            rects, ascending=order_state["is_ascending"])
+    if not is_sorting:
+        if value == 1:
+            print("Initializing Bubble Sort...")
+            sorting_generator = bubble_sort(
+                rects, ascending=order_state["is_ascending"])
+        elif value == 2:
+            print("Initializing Insertion Sort...")
+            sorting_generator = insertion_sort(
+                rects, ascending=order_state["is_ascending"])
+        elif value == 3:
+            print("Initializing Selection Sort...")
+            sorting_generator = selection_sort(
+                rects, ascending=order_state["is_ascending"])
+        elif value == 4:
+            print("Initializing Merge Sort...")
+            sorting_generator = merge_sort(
+                rects, ascending=order_state["is_ascending"])
 
 
 def toggle_order(button, order_state):
@@ -168,7 +173,7 @@ def Sorting_mode():
             ('Merge Sort', 4)
         ],
         onchange=lambda value, _: choose_sorting_algorithm(
-            value[0][1], rects, order_state),  # Extract identifier
+            value[0][1], rects, order_state) if not is_sorting else None,  # Extract identifier
         open_middle=False
     )
     sorting_algorithms.set_alignment(pygame_menu.locals.ALIGN_LEFT)
@@ -180,7 +185,8 @@ def Sorting_mode():
 
     # Add a toggle button for ascending/descending order
     toggle_order_button = sorting_menu.add.button(
-        'Toggle Order: Ascending', lambda: toggle_order(toggle_order_button, order_state))
+        'Toggle Order: Ascending',
+        lambda: toggle_order(toggle_order_button, order_state) if not is_sorting else None)
     toggle_order_button.set_alignment(pygame_menu.locals.ALIGN_LEFT)
 
     # Add a 'Start' button
@@ -210,13 +216,12 @@ def Sorting_mode():
 
         # If sorting is in progress and not paused, step through the generator
         if is_sorting and not is_paused_sorting and sorting_generator is not None:
-            randomize.enabled = False  # Disable the 'Randomize' button
+            fps = sorting_fps  # Set the FPS to the sorting FPS
             try:
                 next(sorting_generator)  # Advance the sorting algorithm
-                fps = sorting_fps  # Set the FPS to the sorting FPS
+
             except StopIteration:
                 sorting_generator = None  # Sorting is complete
-                randomize.enabled = True  # Enable the 'Randomize' button
                 is_sorting = False  # Reset sorting state
                 fps = 60  # Reset FPS
 
@@ -356,7 +361,7 @@ def Graphing_mode():
     adder = graphing_menu.add.dropselect(
         'Component', items=[('Node', 1), ('Line', 2)],
         onchange=lambda component, _: choose_component(
-            component[0][1], current_component),
+            component[0][1], current_component) if not is_graphing else None,
         open_middle=False)  # Adding Component Selector
     adder.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
 
@@ -364,11 +369,11 @@ def Graphing_mode():
     lines = []
     start_hovered_circle = None
     reset = graphing_menu.add.button(
-        'Reset', lambda: remove_components(circles, lines))
+        'Reset', lambda: remove_components(circles, lines) if not is_graphing else None)
     reset.set_alignment(pygame_menu.locals.ALIGN_LEFT)  # Force alignment
 
     graphing_algorithms = graphing_menu.add.dropselect(
-        'Sorting Algorithm: ',
+        'Graphing Algorithm: ',
         items=[
             ('BFS', 1),
             ('DFS', 2),
@@ -390,10 +395,10 @@ def Graphing_mode():
 
     fps = 60
     graphing_fps = 5
-    
+
     explored_edges = set()
     final_path_edges = set()
-    
+
     while True:
         events = pygame.event.get()  # Retrieve all events from Pygame's event queue
 
@@ -464,7 +469,7 @@ def Graphing_mode():
                 color = (128, 0, 128)  # Purple for goal
 
             pygame.draw.circle(screen, color, pos, 10)
-        
+
         pygame.draw.line(screen, color=(255, 255, 255), start_pos=(
             0, 380), end_pos=(1520, 380), width=10)
 
@@ -493,7 +498,6 @@ def Graphing_mode():
 
                 is_graphing = False  # Stop graphing
                 fps = 60
-        
 
         # Refresh the screen and tick the clock
         pygame.display.flip()
